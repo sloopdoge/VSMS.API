@@ -1,3 +1,6 @@
+.idea/
+
+# Main API project
 VSMS.Application/obj/
 VSMS.Application/bin/
 VSMS.Domain/obj/
@@ -6,5 +9,15 @@ VSMS.Repository/obj/
 VSMS.Repository/bin/
 VSMS.Infrastructure/obj/
 VSMS.Infrastructure/bin/
-.idea/
 VSMS.Application/appsettings.Development.json
+
+# Identity service
+VSMS.Identity.Application/obj/
+VSMS.Identity.Application/bin/
+VSMS.Identity.Domain/obj/
+VSMS.Identity.Domain/bin/
+VSMS.Identity.Repository/obj/
+VSMS.Identity.Repository/bin/
+VSMS.Identity.Infrastructure/obj/
+VSMS.Identity.Infrastructure/bin/
+VSMS.Identity.Application/appsettings.Development.json

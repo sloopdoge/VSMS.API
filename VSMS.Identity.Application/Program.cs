@@ -1,7 +1,7 @@
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
-namespace VSMS.Application;
+namespace VSMS.Identity.Application;
 
 public abstract class Program
 {

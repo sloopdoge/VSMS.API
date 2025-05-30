@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\VSMS.Identity.Domain\VSMS.Identity.Domain.csproj" />
+      <ProjectReference Include="..\VSMS.Identity.Repository\VSMS.Identity.Repository.csproj" />
+    </ItemGroup>
+
+</Project>
