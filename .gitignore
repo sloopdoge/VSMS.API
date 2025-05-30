@@ -1,0 +1,10 @@
+VSMS.Application/obj/
+VSMS.Application/bin/
+VSMS.Domain/obj/
+VSMS.Domain/bin/
+VSMS.Repository/obj/
+VSMS.Repository/bin/
+VSMS.Infrastructure/obj/
+VSMS.Infrastructure/bin/
+.idea/
+VSMS.Application/appsettings.Development.json
