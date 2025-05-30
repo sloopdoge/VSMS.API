@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VSMS.Identity.Domain.DTOs;
+using VSMS.Identity.Domain.Models;
 using VSMS.Identity.Infrastructure.Interfaces;
 
 namespace VSMS.Identity.Application.Controllers;
@@ -11,10 +13,16 @@ public class AuthController(
     IUserService userService) : ControllerBase
 {
     /// <summary>
-    /// Method to
+    /// Method for login.
     /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    /// <param name="model">Login model.</param>
+    /// <returns>JWT token.</returns>
+    [AllowAnonymous]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Token))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
@@ -38,6 +46,25 @@ public class AuthController(
             return isPasswordCorrect
                 ? Ok() 
                 : BadRequest($"Password is incorrect.");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("Token/Validate")]
+    public async Task<IActionResult> ValidateToken()
+    {
+        try
+        {
+            return NoContent();
         }
         catch (Exception e)
         {
