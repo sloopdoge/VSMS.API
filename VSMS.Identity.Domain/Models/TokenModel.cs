@@ -1,6 +1,6 @@
 ﻿namespace VSMS.Identity.Domain.Models;
 
-public class Token
+public class TokenModel
 {
     public required string Value { get; set; }
     public DateTime Expires { get; set; }

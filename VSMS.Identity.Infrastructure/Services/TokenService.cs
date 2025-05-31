@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using VSMS.Identity.Domain.Entities;
 using VSMS.Identity.Domain.Models;
 using VSMS.Identity.Infrastructure.Interfaces;
 
@@ -11,7 +12,7 @@ namespace VSMS.Identity.Infrastructure.Services;
 
 public class TokenService(ILogger<TokenService> logger, IConfiguration configuration) : ITokenService
 {
-    public Token GenerateToken(ApplicationUser user, ApplicationRole role, bool rememberMe)
+    public TokenModel GenerateToken(ApplicationUser user, ApplicationRole role, bool rememberMe)
     {
         try
         {

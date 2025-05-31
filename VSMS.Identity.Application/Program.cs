@@ -1,11 +1,14 @@
 using System.Text;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
+using VSMS.Identity.Domain.Entities;
 using VSMS.Identity.Domain.Models;
+using VSMS.Identity.Infrastructure.Initializers;
 using VSMS.Identity.Infrastructure.Interfaces;
 using VSMS.Identity.Infrastructure.Services;
 using VSMS.Identity.Repository;
@@ -14,7 +17,7 @@ namespace VSMS.Identity.Application;
 
 public abstract class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -132,8 +135,20 @@ public abstract class Program
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            
+            builder.Services.AddControllers();
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
+            
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+                await RoleInitializer.Initialize(roleManager);
+                
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                await UserInitializer.Initialize(userManager);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
