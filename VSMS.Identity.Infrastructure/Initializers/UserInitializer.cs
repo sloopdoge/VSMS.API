@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using VSMS.Identity.Domain;
 using VSMS.Identity.Domain.Entities;
 using VSMS.Identity.Domain.Models;
 
 namespace VSMS.Identity.Infrastructure.Initializers;
 
-public class UserInitializer
+public static class UserInitializer
 {
     private static readonly ApplicationUser AdminUser = new()
     {
@@ -17,7 +18,7 @@ public class UserInitializer
     
     private const string AdminPassword = "Password1!";
 
-    public static async Task Initialize(UserManager<ApplicationUser> userManager)
+    public static async Task Initialize(UserManager<ApplicationUser> userManager, ILogger logger)
     {
         var adminUser = await userManager.FindByEmailAsync(AdminUser.Email!);
         if (adminUser is null)
@@ -25,6 +26,8 @@ public class UserInitializer
             var adminUserCreateResult = await userManager.CreateAsync(AdminUser, AdminPassword);
             if (!adminUserCreateResult.Succeeded)
                 throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors));
+            
+            logger.LogInformation($"Admin user created");
         }
 
         if (!await userManager.IsInRoleAsync(AdminUser, RoleNames.Admin))
@@ -32,6 +35,8 @@ public class UserInitializer
             var adminUserAddAdminRoleResult = await userManager.AddToRoleAsync(AdminUser, RoleNames.Admin);
             if (!adminUserAddAdminRoleResult.Succeeded)
                 throw new Exception(string.Join(Environment.NewLine, adminUserAddAdminRoleResult.Errors));
+            
+            logger.LogInformation($"{nameof(UserInitializer)}: Added role to Admin user");
         }
     }
 }

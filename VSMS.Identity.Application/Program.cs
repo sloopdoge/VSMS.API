@@ -143,11 +143,13 @@ public abstract class Program
             
             using (var scope = app.Services.CreateScope())
             {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-                await RoleInitializer.Initialize(roleManager);
+                await RoleInitializer.Initialize(roleManager, logger);
                 
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                await UserInitializer.Initialize(userManager);
+                await UserInitializer.Initialize(userManager, logger);
             }
 
             // Configure the HTTP request pipeline.
