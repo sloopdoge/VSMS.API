@@ -17,7 +17,7 @@ public class AuthController(
     /// Method for login.
     /// </summary>
     /// <param name="model">Login model.</param>
-    /// <returns>JWT token.</returns>
+    /// <returns></returns>
     [AllowAnonymous]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResultModel))]
@@ -74,6 +74,11 @@ public class AuthController(
         }
     }
     
+    /// <summary>
+    /// Method to register a user.
+    /// </summary>
+    /// <param name="model">Register model.</param>
+    /// <returns></returns>
     [AllowAnonymous]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegisterResultModel))]
@@ -107,6 +112,10 @@ public class AuthController(
         }
     }
 
+    /// <summary>
+    /// Method to validate token.
+    /// </summary>
+    /// <returns></returns>
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
