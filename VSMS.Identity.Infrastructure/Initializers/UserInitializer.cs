@@ -8,35 +8,44 @@ namespace VSMS.Identity.Infrastructure.Initializers;
 
 public static class UserInitializer
 {
-    private static readonly ApplicationUser AdminUser = new()
-    {
-        UserName = "admin",
-        FirstName = "Admin",
-        LastName = "Admin",
-        Email = "admin@admin.com",
-    };
-    
     private const string AdminPassword = "Password1!";
+    private const string AdminEmail = "admin@admin.com";
 
     public static async Task Initialize(UserManager<ApplicationUser> userManager, ILogger logger)
     {
-        var adminUser = await userManager.FindByEmailAsync(AdminUser.Email!);
-        if (adminUser is null)
+        try
         {
-            var adminUserCreateResult = await userManager.CreateAsync(AdminUser, AdminPassword);
-            if (!adminUserCreateResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors));
-            
-            logger.LogInformation($"Admin user created");
-        }
+            var adminUser = await userManager.FindByEmailAsync(AdminEmail);
+            if (adminUser is null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    UserName = "admin",
+                    FirstName = "Admin",
+                    LastName = "Admin",
+                    Email = AdminEmail,
+                    EmailConfirmed = true,
+                };
+                
+                var adminUserCreateResult = await userManager.CreateAsync(adminUser, AdminPassword);
+                if (!adminUserCreateResult.Succeeded)
+                    throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors));
+                
+                logger.LogInformation($"Admin user created");
+            }
 
-        if (!await userManager.IsInRoleAsync(AdminUser, RoleNames.Admin))
+            if (!await userManager.IsInRoleAsync(adminUser, RoleNames.Admin))
+            {
+                var adminUserAddAdminRoleResult = await userManager.AddToRoleAsync(adminUser, RoleNames.Admin);
+                if (!adminUserAddAdminRoleResult.Succeeded)
+                    throw new Exception(string.Join(Environment.NewLine, adminUserAddAdminRoleResult.Errors));
+                
+                logger.LogInformation($"{nameof(UserInitializer)}: Added role to Admin user");
+            }
+        }
+        catch (Exception e)
         {
-            var adminUserAddAdminRoleResult = await userManager.AddToRoleAsync(AdminUser, RoleNames.Admin);
-            if (!adminUserAddAdminRoleResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, adminUserAddAdminRoleResult.Errors));
-            
-            logger.LogInformation($"{nameof(UserInitializer)}: Added role to Admin user");
+            logger.LogError(e, e.Message);
         }
     }
 }

@@ -16,54 +16,8 @@ public class UserService(
     RoleManager<ApplicationRole> roleManager,
     ITokenService tokenService) : IUserService
 {
-    public async Task<ApplicationUser?> GetUserByEmail(string email)
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(email))
-                return null;
-            
-            var user = await userManager.FindByEmailAsync(email);
-            return user;
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message, e);
-        }
-    }
+    #region Identity
     
-    public async Task<UserProfileDto> GetUserProfileById(Guid userId)
-    {
-        try
-        {
-            if (userId == Guid.Empty)
-                throw new Exception($"User ID is empty");
-            
-            var user = await userManager.FindByIdAsync(userId.ToString());
-            if (user is null)
-                throw new Exception($"User not found");
-            
-            var userRole = (await userManager.GetRolesAsync(user)).FirstOrDefault();
-            if (userRole is null || string.IsNullOrEmpty(userRole))
-                throw new Exception($"User dont have roles");
-            
-            return new UserProfileDto
-            {
-                Id = user.Id,
-                Username = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Role = userRole,
-            };
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message, e);
-        }
-    }
-
     public async Task<bool> IsPasswordCorrect(ApplicationUser user, string password)
     {
         try
@@ -158,4 +112,212 @@ public class UserService(
             throw new Exception(e.Message, e);
         }
     }
+    
+    #endregion
+    
+    #region Users
+    
+    public async Task<ApplicationUser?> GetUserByEmail(string email)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
+            
+            var user = await userManager.FindByEmailAsync(email);
+            return user;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+    
+    public async Task<ApplicationUser?> GetUserById(Guid id)
+    {
+        try
+        {
+            var user = await userManager.FindByIdAsync(id.ToString());
+            return user;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+    
+    #endregion
+    
+    #region User Profiles
+    
+    public async Task<UserProfileDto?> GetUserProfileById(Guid userId)
+    {
+        try
+        {
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+                return null;
+
+            var roles = await userManager.GetRolesAsync(user);
+
+            return new UserProfileDto
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Role = roles.FirstOrDefault() ?? "None"
+            };
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<UserProfileDto?> CreateUser(UserCreateDto model)
+    {
+        try
+        {
+            var createRes = await userManager.CreateAsync(new ApplicationUser
+            {
+                UserName = model.Username,
+                Email = model.Email,
+            });
+            if (!createRes.Succeeded)
+                throw new Exception(string.Join(Environment.NewLine, createRes.Errors));
+            
+            var createdUser = await userManager.FindByEmailAsync(model.Email);
+            if (createdUser is null)
+                return null;
+            
+            var roleAssignResult = await userManager.AddToRoleAsync(createdUser, model.RoleName);
+            if (!roleAssignResult.Succeeded)
+                throw new Exception(string.Join(Environment.NewLine, roleAssignResult.Errors));
+            
+            var userRole = (await userManager.GetRolesAsync(createdUser)).FirstOrDefault();
+
+            return new UserProfileDto
+            {
+                Id = createdUser.Id,
+                Username = createdUser.UserName,
+                FirstName = createdUser.FirstName,
+                LastName = createdUser.LastName,
+                Email = createdUser.Email,
+                PhoneNumber = createdUser.PhoneNumber,
+                Role = userRole!,
+            };
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<UserProfileDto?> UpdateUserProfile(UserProfileDto updatingUser)
+    {
+        try
+        {
+            var user = await userManager.FindByIdAsync(updatingUser.Id.ToString());
+            if (user is null)
+                throw new Exception($"User to update with ID: {updatingUser.Id} not found.");
+
+            user.FirstName = updatingUser.FirstName ?? user.FirstName;
+            user.LastName = updatingUser.LastName ?? user.LastName;
+            user.Email = updatingUser.Email ?? user.Email;
+            user.PhoneNumber = updatingUser.PhoneNumber ?? user.PhoneNumber;
+            user.UserName = updatingUser.Username ?? user.UserName;
+
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                throw new Exception(string.Join(Environment.NewLine, updateResult.Errors));
+
+            var existingRoles = await userManager.GetRolesAsync(user);
+            var currentRole = existingRoles.FirstOrDefault();
+
+            if (!string.Equals(currentRole, updatingUser.Role, StringComparison.OrdinalIgnoreCase))
+            {
+                if (currentRole is not null)
+                {
+                    var removeResult = await userManager.RemoveFromRoleAsync(user, currentRole);
+                    if (!removeResult.Succeeded)
+                        throw new Exception(string.Join(Environment.NewLine, removeResult.Errors));
+                }
+
+                var assignResult = await userManager.AddToRoleAsync(user, updatingUser.Role);
+                if (!assignResult.Succeeded)
+                    throw new Exception(string.Join(Environment.NewLine, assignResult.Errors));
+            }
+
+            return new UserProfileDto
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Role = updatingUser.Role
+            };
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<bool> DeleteUserById(Guid userId)
+    {
+        try
+        {
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+                throw new Exception($"User to delete with ID: {userId} not found.");
+
+            var deleteResult = await userManager.DeleteAsync(user);
+            if (!deleteResult.Succeeded)
+                throw new Exception(string.Join(Environment.NewLine, deleteResult.Errors));
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<List<UserProfileDto>> GetAllUserProfiles()
+    {
+        try
+        {
+            var users = userManager.Users.ToList();
+
+            var profiles = new List<UserProfileDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                profiles.Add(new UserProfileDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = roles.FirstOrDefault() ?? "None"
+                });
+            }
+
+            return profiles;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+    
+    #endregion
 }
