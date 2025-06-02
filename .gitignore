@@ -21,3 +21,14 @@ VSMS.Identity.Repository/bin/
 VSMS.Identity.Infrastructure/obj/
 VSMS.Identity.Infrastructure/bin/
 VSMS.Identity.Application/appsettings.Development.json
+
+# Stock service
+VSMS.Stock.Application/obj/
+VSMS.Stock.Application/bin/
+VSMS.Stock.Domain/obj/
+VSMS.Stock.Domain/bin/
+VSMS.Stock.Repository/obj/
+VSMS.Stock.Repository/bin/
+VSMS.Stock.Infrastructure/obj/
+VSMS.Stock.Infrastructure/bin/
+VSMS.Stock.Application/appsettings.Development.json
