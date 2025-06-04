@@ -140,7 +140,7 @@ public class UsersController(
     /// Method to Delete User by ID.
     /// </summary>
     /// <param name="userId">User ID.</param>
-    /// <returns>Is successes.</returns>
+    /// <returns>Indicates whether the deletion succeeded.</returns>
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDto))]
