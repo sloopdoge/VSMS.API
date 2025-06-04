@@ -1,9 +1,8 @@
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
-namespace VSMS.Stock.Application;
+namespace VSMS.Company.Application;
 
 public abstract class Program
 {
@@ -46,7 +45,7 @@ public abstract class Program
 
         #endregion
 
-        Log.Warning("Starting Stocks Service web host");
+        Log.Warning("Starting Company Service web host");
         try
         {
             // Add services to the container.
@@ -78,7 +77,7 @@ public abstract class Program
         }
         finally
         {
-            Log.Warning("Stocks Service web host shutdown");
+            Log.Warning("Company Service web host shutdown");
             Log.CloseAndFlush();
         }
     }

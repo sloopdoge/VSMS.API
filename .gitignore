@@ -32,3 +32,14 @@ VSMS.Stock.Repository/bin/
 VSMS.Stock.Infrastructure/obj/
 VSMS.Stock.Infrastructure/bin/
 VSMS.Stock.Application/appsettings.Development.json
+
+# Stock service
+VSMS.Company.Application/obj/
+VSMS.Company.Application/bin/
+VSMS.Company.Domain/obj/
+VSMS.Company.Domain/bin/
+VSMS.Company.Repository/obj/
+VSMS.Company.Repository/bin/
+VSMS.Company.Infrastructure/obj/
+VSMS.Company.Infrastructure/bin/
+VSMS.Company.Application/appsettings.Development.json

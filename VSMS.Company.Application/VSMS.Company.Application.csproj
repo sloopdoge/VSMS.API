@@ -4,9 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <AssemblyVersion>0.0.0.1</AssemblyVersion>
-        <FileVersion>0.0.0.1</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,13 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\VSMS.Stock.Infrastructure\VSMS.Stock.Infrastructure.csproj" />
+      <Folder Include="Controllers\" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+      <ProjectReference Include="..\VSMS.Company.Infrastructure\VSMS.Company.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
