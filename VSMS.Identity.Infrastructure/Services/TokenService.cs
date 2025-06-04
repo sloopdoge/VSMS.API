@@ -30,22 +30,22 @@ public class TokenService(ILogger<TokenService> logger, IConfiguration configura
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var expiration = rememberMe
+                ? DateTime.UtcNow.AddMinutes(expiresIn)
+                : DateTime.UtcNow.AddMinutes(30);
+
             var token = new JwtSecurityToken(
                 issuer: jwtSettings.GetValue<string>("Issuer"),
                 audience: jwtSettings.GetValue<string>("Audience"),
                 claims: claims,
-                expires: rememberMe 
-                    ? DateTime.UtcNow.AddMinutes(expiresIn) 
-                    : DateTime.UtcNow.AddDays(1),
+                expires: expiration,
                 signingCredentials: creds
             );
 
             return new()
             {
                 Value = new JwtSecurityTokenHandler().WriteToken(token),
-                Expires = rememberMe 
-                    ? DateTime.UtcNow.AddMinutes(expiresIn) 
-                    : DateTime.UtcNow.AddMinutes(30)
+                Expires = expiration
             };
         }
         catch (Exception e)
