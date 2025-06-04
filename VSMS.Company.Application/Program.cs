@@ -60,14 +60,15 @@ public abstract class Program
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
+            
+            app.MapOpenApi();
             app.UseHttpsRedirection();
+            
+            app.UsePathBase("/api/Companies");
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapControllers();
 
             app.Run();
         }

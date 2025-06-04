@@ -152,14 +152,15 @@ public abstract class Program
                 await UserInitializer.Initialize(userManager, logger);
             }
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
+            app.MapOpenApi();
             app.UseHttpsRedirection();
 
+            app.UsePathBase("/api/Identity");
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapControllers();
+            
             app.Run();
         }
         catch (Exception e)
@@ -169,7 +170,7 @@ public abstract class Program
         finally
         {
             Log.Warning("Identity Service web host shutdown");
-            Log.CloseAndFlush();
+            await Log.CloseAndFlushAsync();
         }
     }
 }
