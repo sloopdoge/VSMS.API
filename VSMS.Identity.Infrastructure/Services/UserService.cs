@@ -40,7 +40,7 @@ public class UserService(
         {
             var roleName = (await userManager.GetRolesAsync(user)).FirstOrDefault();
             if (roleName is null || string.IsNullOrEmpty(roleName))
-                throw new Exception("User dont have any roles.");
+                throw new Exception("User doesn't have any roles.");
             
             var role = await roleManager.FindByNameAsync(roleName);
             if (role is null)
