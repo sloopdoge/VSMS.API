@@ -51,7 +51,8 @@ public abstract class Program
         {
             // Add services to the container.
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
             
             var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             
@@ -69,7 +70,13 @@ public abstract class Program
             app.UseAuthorization();
             app.UseHttpsRedirection();
             
-            app.MapOpenApi("/api/stocks/openapi/{documentName}/openapi.json");
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/api/stocks/swagger/v1/swagger.json", "Stock Service API V1");
+                c.RoutePrefix = "swagger";
+            });
+
             app.MapControllers();
             
             app.Run();

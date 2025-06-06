@@ -62,7 +62,8 @@ public abstract class Program
         {
             // Add services to the container.
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
             
             var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationDbContext>(options => 
@@ -160,7 +161,13 @@ public abstract class Program
             app.UseAuthentication();
             app.UseAuthorization();
             
-            app.MapOpenApi("/api/identity/openapi/{documentName}/openapi.json");
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/api/identity/swagger/v1/swagger.json", "Identity Service API V1");
+                c.RoutePrefix = "swagger";
+            });
+
             app.MapControllers();
             
             app.Run();

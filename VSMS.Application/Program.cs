@@ -1,3 +1,4 @@
+using FluentValidation;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
@@ -49,17 +50,35 @@ public abstract class Program
         {
             // Add services to the container.
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+            
+            var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            
+            builder.Services.AddAuthorization();
+
+            builder.Services.AddControllers();
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
+            app.UseStaticFiles();
+            
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseHttpsRedirection();
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/api/identity/swagger/v1/swagger.json", "Identity Service API");
+                c.SwaggerEndpoint("/api/companies/swagger/v1/swagger.json", "Company Service API");
+                c.SwaggerEndpoint("/api/stocks/swagger/v1/swagger.json", "Stock Service API");
+                c.RoutePrefix = "api/swagger";
+            });
+
+            app.MapControllers();
 
             app.Run();
         }

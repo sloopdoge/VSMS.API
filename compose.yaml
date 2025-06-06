@@ -7,9 +7,22 @@
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
+      - vsms-api
+      - identity-service
       - company-service
       - stock-service
-      - identity-service
+      
+  vsms-api:
+    build: ./VSMS.Application
+    container_name: vsms-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${DEFAULT_DB_CONNECTION_STRING}
+      - LokiSettings__Url=${SERVICE_LOKI_URL}
+      - LokiSettings__AppName=${SERVICE_LOKI_APP_NAME}
+      - DOTNET_URLS=http://+:6000
+    expose:
+        - "6000"
         
   identity-service:
     build: ./VSMS.Identity.Application
@@ -23,9 +36,9 @@
       - JwtSettings__Issuer=${IDENTITY_SERVICE_JWT_ISSUER}
       - JwtSettings__Audience=${IDENTITY_SERVICE_JWT_AUDIENCE}
       - JwtSettings__ExpiresInMinutes=${IDENTITY_SERVICE_JWT_EXPIRES}
-      - DOTNET_URLS=http://+:6000
+      - DOTNET_URLS=http://+:6010
     expose:
-      - "6000"
+      - "6010"
 
   company-service:
     build: ./VSMS.Company.Application
@@ -47,6 +60,6 @@
       - ConnectionStrings__DefaultConnection=${STOCK_SERVICE_DEFAULT_DB_CONNECTION_STRING}
       - LokiSettings__Url=${STOCK_SERVICE_LOKI_URL}
       - LokiSettings__AppName=${STOCK_SERVICE_LOKI_APP_NAME}
-      - DOTNET_URLS=http://+:6040
+      - DOTNET_URLS=http://+:6030
     expose:
-      - "6040"
+      - "6030"
