@@ -1,0 +1,52 @@
+﻿services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - company-service
+      - stock-service
+      - identity-service
+        
+  identity-service:
+    build: ./VSMS.Identity.Application
+    container_name: identity-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${IDENTITY_SERVICE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${IDENTITY_SERVICE_DEFAULT_DB_CONNECTION_STRING}
+      - LokiSettings__Url=${IDENTITY_SERVICE_LOKI_URL}
+      - LokiSettings__AppName=${IDENTITY_SERVICE_LOKI_APP_NAME}
+      - JwtSettings__SecretKey=${IDENTITY_SERVICE_JWT_SECRET_KEY}
+      - JwtSettings__Issuer=${IDENTITY_SERVICE_JWT_ISSUER}
+      - JwtSettings__Audience=${IDENTITY_SERVICE_JWT_AUDIENCE}
+      - JwtSettings__ExpiresInMinutes=${IDENTITY_SERVICE_JWT_EXPIRES}
+      - DOTNET_URLS=http://+:6000
+    expose:
+      - "6000"
+
+  company-service:
+    build: ./VSMS.Company.Application
+    container_name: company-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${COMPANY_SERVICE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${COMPANY_SERVICE_DEFAULT_DB_CONNECTION_STRING}
+      - LokiSettings__Url=${COMPANY_SERVICE_LOKI_URL}
+      - LokiSettings__AppName=${COMPANY_SERVICE_LOKI_APP_NAME}
+      - DOTNET_URLS=http://+:6020
+    expose:
+      - "6020"
+
+  stock-service:
+    build: ./VSMS.Stock.Application
+    container_name: stock-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${STOCK_SERVICE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${STOCK_SERVICE_DEFAULT_DB_CONNECTION_STRING}
+      - LokiSettings__Url=${STOCK_SERVICE_LOKI_URL}
+      - LokiSettings__AppName=${STOCK_SERVICE_LOKI_APP_NAME}
+      - DOTNET_URLS=http://+:6040
+    expose:
+      - "6040"

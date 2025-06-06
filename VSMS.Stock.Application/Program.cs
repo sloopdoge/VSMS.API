@@ -61,16 +61,17 @@ public abstract class Program
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
+            app.UsePathBase("/api/stocks");
+            app.UseStaticFiles();
             
-            app.MapOpenApi();
-            app.UseHttpsRedirection();
-            
-            app.UsePathBase("/api/Stocks");
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseHttpsRedirection();
+            
+            app.MapOpenApi("/api/stocks/openapi/{documentName}/openapi.json");
             app.MapControllers();
-
+            
             app.Run();
         }
         catch (Exception e)

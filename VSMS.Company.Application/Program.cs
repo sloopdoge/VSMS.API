@@ -61,13 +61,14 @@ public abstract class Program
 
             var app = builder.Build();
             
-            app.MapOpenApi();
-            app.UseHttpsRedirection();
-            
-            app.UsePathBase("/api/Companies");
+            app.UsePathBase("/api/companies");
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.MapOpenApi("/api/companies/openapi/{documentName}/openapi.json");
+            app.UseHttpsRedirection();
+            
             app.MapControllers();
 
             app.Run();

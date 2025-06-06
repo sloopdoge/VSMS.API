@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 using VSMS.Identity.Domain.Entities;
@@ -152,13 +153,14 @@ public abstract class Program
                 await UserInitializer.Initialize(userManager, logger);
             }
 
-            app.MapOpenApi();
-            app.UseHttpsRedirection();
+            app.UsePathBase("/api/identity");
 
-            app.UsePathBase("/api/Identity");
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.MapOpenApi("/api/identity/openapi/{documentName}/openapi.json");
             app.MapControllers();
             
             app.Run();
