@@ -1,6 +1,10 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
+using VSMS.Company.Infrastructure.Interfaces;
+using VSMS.Company.Infrastructure.Services;
+using VSMS.Company.Repository;
 
 namespace VSMS.Company.Application;
 
@@ -53,12 +57,16 @@ public abstract class Program
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
-            var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            
             builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+            
+            var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<CompaniesDbContext>(options => 
+                options.UseSqlServer(defaultConnectionString));
+
+            builder.Services.AddScoped<ICompaniesService, CompaniesService>();
 
             var app = builder.Build();
             
