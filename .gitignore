@@ -1,4 +1,5 @@
 .idea/
+../VSMS.API/appsettings.vsms.json
 
 # Main API project
 VSMS.Application/obj/

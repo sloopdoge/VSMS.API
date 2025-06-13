@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
@@ -55,7 +56,27 @@ public abstract class Program
             
             var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = builder.Configuration["IdentityServiceSettings:Issuer"];
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = true,
+                        ValidAudience = builder.Configuration["IdentityServiceSettings:Audience"],
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["IdentityServiceSettings:Issuer"],
+                        ValidateLifetime = true
+                    };
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Default", policy => policy.RequireAuthenticatedUser());
+            });
+
+            builder.Services.AddReverseProxy()
+                .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();

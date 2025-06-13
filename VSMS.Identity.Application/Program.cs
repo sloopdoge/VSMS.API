@@ -164,7 +164,7 @@ public abstract class Program
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/api/identity/swagger/v1/swagger.json", "Identity Service API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Service API V1");
                 c.RoutePrefix = "swagger";
             });
 

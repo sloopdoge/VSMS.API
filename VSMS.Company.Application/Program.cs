@@ -78,7 +78,7 @@ public abstract class Program
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/api/companies/swagger/v1/swagger.json", "Company Service API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company Service API V1");
                 c.RoutePrefix = "swagger";
             });
 

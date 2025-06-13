@@ -8,19 +8,15 @@
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - vsms-api
-      - identity-service
-      - company-service
-      - stock-service
       
   vsms-api:
     build: ./VSMS.Application
     container_name: vsms-api
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=${DEFAULT_DB_CONNECTION_STRING}
-      - LokiSettings__Url=${SERVICE_LOKI_URL}
-      - LokiSettings__AppName=${SERVICE_LOKI_APP_NAME}
       - DOTNET_URLS=http://+:6000
+    volumes:
+      - ./appsettings.Production.json:/app/appsettings.Production.json:ro
     expose:
         - "6000"
         
@@ -29,6 +25,7 @@
     container_name: identity-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${IDENTITY_SERVICE_ENVIRONMENT}
+      - DOTNET_URLS=http://+:6010
       - ConnectionStrings__DefaultConnection=${IDENTITY_SERVICE_DEFAULT_DB_CONNECTION_STRING}
       - LokiSettings__Url=${IDENTITY_SERVICE_LOKI_URL}
       - LokiSettings__AppName=${IDENTITY_SERVICE_LOKI_APP_NAME}
@@ -36,7 +33,6 @@
       - JwtSettings__Issuer=${IDENTITY_SERVICE_JWT_ISSUER}
       - JwtSettings__Audience=${IDENTITY_SERVICE_JWT_AUDIENCE}
       - JwtSettings__ExpiresInMinutes=${IDENTITY_SERVICE_JWT_EXPIRES}
-      - DOTNET_URLS=http://+:6010
     expose:
       - "6010"
 
@@ -45,10 +41,10 @@
     container_name: company-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${COMPANY_SERVICE_ENVIRONMENT}
+      - DOTNET_URLS=http://+:6020
       - ConnectionStrings__DefaultConnection=${COMPANY_SERVICE_DEFAULT_DB_CONNECTION_STRING}
       - LokiSettings__Url=${COMPANY_SERVICE_LOKI_URL}
       - LokiSettings__AppName=${COMPANY_SERVICE_LOKI_APP_NAME}
-      - DOTNET_URLS=http://+:6020
     expose:
       - "6020"
 
@@ -57,9 +53,9 @@
     container_name: stock-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${STOCK_SERVICE_ENVIRONMENT}
+      - DOTNET_URLS=http://+:6030
       - ConnectionStrings__DefaultConnection=${STOCK_SERVICE_DEFAULT_DB_CONNECTION_STRING}
       - LokiSettings__Url=${STOCK_SERVICE_LOKI_URL}
       - LokiSettings__AppName=${STOCK_SERVICE_LOKI_APP_NAME}
-      - DOTNET_URLS=http://+:6030
     expose:
       - "6030"
