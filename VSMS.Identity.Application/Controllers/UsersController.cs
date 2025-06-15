@@ -5,10 +5,11 @@ using VSMS.Identity.Infrastructure.Interfaces;
 
 namespace VSMS.Identity.Application.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UsersController(
-    ILogger<AuthController> logger,
+    ILogger<UsersController> logger,
     IUserService userService) : ControllerBase
 {
     /// <summary>

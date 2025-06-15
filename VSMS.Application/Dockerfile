@@ -23,5 +23,4 @@ RUN dotnet publish "./VSMS.Application.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY ./VSMS.Application/appsettings.Production.json ./appsettings.Production.json
 ENTRYPOINT ["dotnet", "VSMS.Application.dll"]

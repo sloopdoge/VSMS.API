@@ -70,7 +70,7 @@ public abstract class Program
 
             var app = builder.Build();
             
-            app.UsePathBase("/api/companies");
+            app.UsePathBase("/api/Companies");
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -78,8 +78,8 @@ public abstract class Program
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company Service API V1");
-                c.RoutePrefix = "swagger";
+                c.SwaggerEndpoint("/api/Companies/swagger/v1/swagger.json", "Company Service API V1");
+                c.RoutePrefix = "api/Companies/swagger";
             });
 
             app.UseHttpsRedirection();

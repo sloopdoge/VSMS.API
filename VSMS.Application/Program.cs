@@ -59,7 +59,8 @@ public abstract class Program
             builder.Services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = builder.Configuration["IdentityServiceSettings:Issuer"];
+                    options.Authority = builder.Configuration["IdentityServiceSettings:Url"];
+                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = true,
@@ -69,38 +70,39 @@ public abstract class Program
                         ValidateLifetime = true
                     };
                 });
-
+            
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("Default", policy => policy.RequireAuthenticatedUser());
+                options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
             });
-
+            
+            builder.Services.AddControllers();
             builder.Services.AddReverseProxy()
                 .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
-
-            builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
 
             app.UseStaticFiles();
-            
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseHttpsRedirection();
             
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/api/identity/swagger/v1/swagger.json", "Identity Service API");
-                c.SwaggerEndpoint("/api/companies/swagger/v1/swagger.json", "Company Service API");
-                c.SwaggerEndpoint("/api/stocks/swagger/v1/swagger.json", "Stock Service API");
+                c.SwaggerEndpoint("/api/Identity/swagger/v1/swagger.json", "Identity Service API");
+                c.SwaggerEndpoint("/api/Companies/swagger/v1/swagger.json", "Company Service API");
+                c.SwaggerEndpoint("/api/Stocks/swagger/v1/swagger.json", "Stock Service API");
                 c.RoutePrefix = "api/swagger";
             });
+            
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseHttpsRedirection();
+            
 
             app.MapControllers();
-
+            app.MapReverseProxy();
+            
             app.Run();
         }
         catch (Exception e)

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VSMS.Identity.Domain.DTOs;
-using VSMS.Identity.Domain.Entities;
 using VSMS.Identity.Domain.Models;
 using VSMS.Identity.Infrastructure.Interfaces;
 

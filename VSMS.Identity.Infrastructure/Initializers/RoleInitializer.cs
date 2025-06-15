@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using VSMS.Identity.Domain;
 using VSMS.Identity.Domain.Entities;
-using VSMS.Identity.Domain.Models;
 
 namespace VSMS.Identity.Infrastructure.Initializers;
 

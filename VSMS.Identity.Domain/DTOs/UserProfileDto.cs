@@ -1,6 +1,4 @@
-﻿using VSMS.Identity.Domain.Models;
-
-namespace VSMS.Identity.Domain.DTOs;
+﻿namespace VSMS.Identity.Domain.DTOs;
 
 public class UserProfileDto
 {

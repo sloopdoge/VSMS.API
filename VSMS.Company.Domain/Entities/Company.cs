@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using VSMS.Company.Domain.DTOs;
 
 namespace VSMS.Company.Domain.Entities;
 

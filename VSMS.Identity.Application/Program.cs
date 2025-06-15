@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 using VSMS.Identity.Domain.Entities;
-using VSMS.Identity.Domain.Models;
 using VSMS.Identity.Infrastructure.Initializers;
 using VSMS.Identity.Infrastructure.Interfaces;
 using VSMS.Identity.Infrastructure.Services;
@@ -154,20 +152,18 @@ public abstract class Program
                 await UserInitializer.Initialize(userManager, logger);
             }
 
-            app.UsePathBase("/api/identity");
-
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
             
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity Service API V1");
-                c.RoutePrefix = "swagger";
+                c.SwaggerEndpoint("/api/Identity/swagger/v1/swagger.json", "Identity Service API");
+                c.RoutePrefix = "api/Identity/swagger";
             });
 
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
             
             app.Run();

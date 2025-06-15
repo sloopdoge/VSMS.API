@@ -1,5 +1,4 @@
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
@@ -62,7 +61,7 @@ public abstract class Program
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
-            app.UsePathBase("/api/stocks");
+            app.UsePathBase("/api/Stocks");
             app.UseStaticFiles();
             
             app.UseRouting();
@@ -73,8 +72,8 @@ public abstract class Program
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock Service API V1");
-                c.RoutePrefix = "swagger";
+                c.SwaggerEndpoint("/api/Stocks/swagger/v1/swagger.json", "Stock Service API V1");
+                c.RoutePrefix = "api/Stocks/swagger";
             });
 
             app.MapControllers();

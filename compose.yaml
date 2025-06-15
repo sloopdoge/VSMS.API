@@ -10,7 +10,9 @@
       - vsms-api
       
   vsms-api:
-    build: ./VSMS.Application
+    build:
+      context: .
+      dockerfile: VSMS.Application/Dockerfile
     container_name: vsms-api
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
@@ -21,7 +23,9 @@
         - "6000"
         
   identity-service:
-    build: ./VSMS.Identity.Application
+    build:
+      context: .
+      dockerfile: VSMS.Identity.Application/Dockerfile
     container_name: identity-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${IDENTITY_SERVICE_ENVIRONMENT}
@@ -37,7 +41,9 @@
       - "6010"
 
   company-service:
-    build: ./VSMS.Company.Application
+    build:
+      context: .
+      dockerfile: VSMS.Company.Application/Dockerfile
     container_name: company-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${COMPANY_SERVICE_ENVIRONMENT}
@@ -49,7 +55,9 @@
       - "6020"
 
   stock-service:
-    build: ./VSMS.Stock.Application
+    build:
+      context: .
+      dockerfile: VSMS.Stock.Application/Dockerfile
     container_name: stock-service
     environment:
       - ASPNETCORE_ENVIRONMENT=${STOCK_SERVICE_ENVIRONMENT}

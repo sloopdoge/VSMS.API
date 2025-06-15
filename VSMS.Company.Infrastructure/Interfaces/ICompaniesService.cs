@@ -1,5 +1,4 @@
 ﻿using VSMS.Company.Domain.DTOs;
-using VSMS.Company.Domain.Entities;
 
 namespace VSMS.Company.Infrastructure.Interfaces;
 
