@@ -30,7 +30,7 @@ public static class UserInitializer
                 if (!adminUserCreateResult.Succeeded)
                     throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors));
                 
-                logger.LogInformation($"Admin user created");
+                logger.LogInformation("Admin user created");
             }
 
             if (!await userManager.IsInRoleAsync(adminUser, RoleNames.Admin))

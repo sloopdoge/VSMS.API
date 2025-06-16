@@ -31,7 +31,7 @@ public class AuthController(
             var user = await userService.GetUserByEmail(model.Email);
             if (user is null)
                 return NotFound(
-                    new LoginResultModel()
+                    new LoginResultModel
                     {
                         Success = false,
                         UserProfile = null,
@@ -41,12 +41,12 @@ public class AuthController(
             
             var isPasswordCorrect = await userService.IsPasswordCorrect(user, model.Password);
             if (!isPasswordCorrect)
-                return BadRequest(new LoginResultModel()
+                return BadRequest(new LoginResultModel
                 {
                     Success = false,
                     UserProfile = null,
                     Token = null,
-                    Errors = [$"Password is incorrect"]
+                    Errors = ["Password is incorrect"]
                 });
             
             var token = await userService.GenerateToken(user, model.UseLongLivedToken);
@@ -56,7 +56,7 @@ public class AuthController(
                     Success = false,
                     UserProfile = null,
                     Token = null,
-                    Errors = [$"There was error creating token"]
+                    Errors = ["There was error creating token"]
                 });
             
             return Ok(new LoginResultModel

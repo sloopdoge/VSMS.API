@@ -118,7 +118,7 @@ public class UsersController(
         try
         {
             if (userId == Guid.Empty)
-                return BadRequest($"User Id is empty.");
+                return BadRequest("User Id is empty.");
 
             var user = await userService.GetUserProfileById(userId);
             if (user is null)
@@ -156,7 +156,7 @@ public class UsersController(
         try
         {
             if (userId == Guid.Empty)
-                return BadRequest($"User Id is empty.");
+                return BadRequest("User Id is empty.");
 
             var user = await userService.GetUserProfileById(userId);
             if (user is null)
