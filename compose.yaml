@@ -17,6 +17,10 @@
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - DOTNET_URLS=http://+:6000
+      - IdentityServiceSettings__SecretKey=${IDENTITY_SERVICE_SECRET_KEY}
+      - IdentityServiceSettings__Audience=${IDENTITY_SERVICE_AUDIENCE}
+      - IdentityServiceSettings__Issuer=${IDENTITY_SERVICE_ISSUER}
+      - IdentityServiceSettings__Url=${IDENTITY_SERVICE_URL}
     volumes:
       - ./appsettings.Production.json:/app/appsettings.Production.json:ro
       - ./appsettings.Development.json:/app/appsettings.Development.json:ro
@@ -36,9 +40,9 @@
       - ConnectionStrings__DefaultConnection=${IDENTITY_SERVICE_DEFAULT_DB_CONNECTION_STRING}
       - LokiSettings__Url=${IDENTITY_SERVICE_LOKI_URL}
       - LokiSettings__AppName=${IDENTITY_SERVICE_LOKI_APP_NAME}
-      - JwtSettings__SecretKey=${IDENTITY_SERVICE_JWT_SECRET_KEY}
-      - JwtSettings__Issuer=${IDENTITY_SERVICE_JWT_ISSUER}
-      - JwtSettings__Audience=${IDENTITY_SERVICE_JWT_AUDIENCE}
+      - JwtSettings__SecretKey=${IDENTITY_SERVICE_SECRET_KEY}
+      - JwtSettings__Issuer=${IDENTITY_SERVICE_ISSUER}
+      - JwtSettings__Audience=${IDENTITY_SERVICE_AUDIENCE}
       - JwtSettings__ExpiresInMinutes=${IDENTITY_SERVICE_JWT_EXPIRES}
     expose:
       - "6010"

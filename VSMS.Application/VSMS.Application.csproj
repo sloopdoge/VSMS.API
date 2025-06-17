@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VSMS.Company.Application\VSMS.Company.Application.csproj" />
+    <ProjectReference Include="..\VSMS.Identity.Application\VSMS.Identity.Application.csproj" />
     <ProjectReference Include="..\VSMS.Infrastructure\VSMS.Infrastructure.csproj"/>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
@@ -17,6 +19,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
+    <ProjectReference Include="..\VSMS.Stock.Application\VSMS.Stock.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

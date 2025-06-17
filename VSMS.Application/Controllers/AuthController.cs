@@ -4,7 +4,7 @@ using VSMS.Identity.Domain.DTOs;
 using VSMS.Identity.Domain.Models;
 using VSMS.Identity.Infrastructure.Interfaces;
 
-namespace VSMS.Identity.Application.Controllers;
+namespace VSMS.Application.Controllers;
 
 [ApiController]
 [Route("[controller]")]

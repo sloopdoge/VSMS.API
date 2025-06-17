@@ -1,7 +1,11 @@
+using System.Text;
 using FluentValidation;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
+using VSMS.Company.Application;
+using VSMS.Identity.Application;
+using VSMS.Stock.Application;
 
 namespace VSMS.Application;
 
@@ -49,36 +53,16 @@ public abstract class Program
         Log.Warning("Starting web host");
         try
         {
-            // Add services to the container.
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.AddIdentityService();
+            builder.AddCompanyService();
+            builder.AddStockService();
             
             var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             
-            builder.Services.AddAuthentication("Bearer")
-                .AddJwtBearer("Bearer", options =>
-                {
-                    options.Authority = builder.Configuration["IdentityServiceSettings:Url"];
-                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateAudience = true,
-                        ValidAudience = builder.Configuration["IdentityServiceSettings:Audience"],
-                        ValidateIssuer = true,
-                        ValidIssuer = builder.Configuration["IdentityServiceSettings:Issuer"],
-                        ValidateLifetime = true
-                    };
-                });
-            
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
-            });
-            
             builder.Services.AddControllers();
-            builder.Services.AddReverseProxy()
-                .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
@@ -87,18 +71,11 @@ public abstract class Program
             app.UseRouting();
             
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/api/Identity/swagger/v1/swagger.json", "Identity Service API");
-                c.SwaggerEndpoint("/api/Companies/swagger/v1/swagger.json", "Company Service API");
-                c.SwaggerEndpoint("/api/Stocks/swagger/v1/swagger.json", "Stock Service API");
-                c.RoutePrefix = "api/swagger";
-            });
+            app.UseSwaggerUI();
             
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseHttpsRedirection();
-            
 
             app.MapControllers();
             app.MapReverseProxy();
