@@ -4,6 +4,7 @@ using VSMS.Domain;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Models;
+using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
 
@@ -138,6 +139,9 @@ public class UserService(
         try
         {
             var user = await userManager.FindByIdAsync(id.ToString());
+            if (user is null)
+                throw new UserNotFoundException(id);
+
             return user;
         }
         catch (Exception e)
@@ -156,7 +160,7 @@ public class UserService(
         {
             var user = await userManager.FindByIdAsync(userId.ToString());
             if (user is null)
-                return null;
+                throw new UserNotFoundException(userId);
 
             var roles = await userManager.GetRolesAsync(user);
 
@@ -191,7 +195,7 @@ public class UserService(
             
             var createdUser = await userManager.FindByEmailAsync(model.Email);
             if (createdUser is null)
-                return null;
+                throw new UserNotFoundException(model.Email);
             
             var roleAssignResult = await userManager.AddToRoleAsync(createdUser, model.RoleName);
             if (!roleAssignResult.Succeeded)
@@ -222,7 +226,7 @@ public class UserService(
         {
             var user = await userManager.FindByIdAsync(updatingUser.Id.ToString());
             if (user is null)
-                throw new Exception($"User to update with ID: {updatingUser.Id} not found.");
+                throw new UserNotFoundException(updatingUser.Id);
 
             user.FirstName = updatingUser.FirstName ?? user.FirstName;
             user.LastName = updatingUser.LastName ?? user.LastName;
@@ -274,7 +278,7 @@ public class UserService(
         {
             var user = await userManager.FindByIdAsync(userId.ToString());
             if (user is null)
-                throw new Exception($"User to delete with ID: {userId} not found.");
+                throw new UserNotFoundException(userId);
 
             var deleteResult = await userManager.DeleteAsync(user);
             if (!deleteResult.Succeeded)
