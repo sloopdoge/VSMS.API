@@ -6,7 +6,7 @@ using VSMS.Company.Domain.DTOs;
 using VSMS.Company.Domain.Exceptions;
 using VSMS.Company.Infrastructure.Interfaces;
 
-namespace VSMS.Application.Controllers;
+namespace VSMS.Company.Application.Controllers;
 
 [Authorize]
 [ApiController]
