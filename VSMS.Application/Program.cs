@@ -78,7 +78,6 @@ public abstract class Program
             app.UseHttpsRedirection();
 
             app.MapControllers();
-            app.MapReverseProxy();
             
             app.Run();
         }
