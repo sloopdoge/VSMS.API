@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.DTOs;
+using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Application.Controllers;
@@ -57,10 +58,11 @@ public class UsersController(
         try
         {
             var user = await userService.GetUserProfileById(userId);
-            if (user is null)
-                return NotFound();
-            
             return Ok(user);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
         }
         catch (Exception e)
         {
@@ -87,10 +89,11 @@ public class UsersController(
         try
         {
             var user = await userService.CreateUser(model);
-            if (user is null)
-                return StatusCode(418, $"Created user with email: {model.Email} not found.");
-            
             return Ok(user);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound();
         }
         catch (Exception e)
         {
@@ -120,15 +123,12 @@ public class UsersController(
             if (userId == Guid.Empty)
                 return BadRequest("User Id is empty.");
 
-            var user = await userService.GetUserProfileById(userId);
-            if (user is null)
-                return NotFound($"User with ID: {userId} not found.");
-
             var updatedUser = await userService.UpdateUserProfile(model);
-            if (updatedUser is null)
-                return StatusCode(418, $"Updated user with ID: {userId} not found.");
-            
             return Ok(updatedUser);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound($"User with ID: {userId} not found.");
         }
         catch (Exception e)
         {
@@ -158,15 +158,15 @@ public class UsersController(
             if (userId == Guid.Empty)
                 return BadRequest("User Id is empty.");
 
-            var user = await userService.GetUserProfileById(userId);
-            if (user is null)
-                return NotFound($"User with ID: {userId} not found.");
-
             var result = await userService.DeleteUserById(userId);
 
-            return result 
-                ? NoContent() 
+            return result
+                ? NoContent()
                 : StatusCode(418);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound($"User with ID: {userId} not found.");
         }
         catch (Exception e)
         {
