@@ -65,6 +65,7 @@ public abstract class Program
 
             var app = builder.Build();
 
+            app.UsePathBase($"api");
             app.UseStaticFiles();
             app.UseRouting();
             
