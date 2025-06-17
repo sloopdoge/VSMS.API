@@ -62,8 +62,6 @@ public class CompaniesController(
         try
         {
             var company = await companiesService.Create(model);
-            if (company is null)
-                return StatusCode(418, $"Created company with title: {model.Title} not found.");
 
             return Ok(company);
         }
@@ -94,11 +92,7 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty)
                 return BadRequest("Company Id is empty.");
-
-            var company = await companiesService.GetById(companyId);
-            if (company is null)
-                return NotFound($"Company with ID: {companyId} not found.");
-
+            
             var updatedCompany = await companiesService.Update(model);
             return Ok(updatedCompany);
         }
@@ -133,10 +127,6 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty)
                 return BadRequest("Company Id is empty.");
-
-            var company = await companiesService.GetById(companyId);
-            if (company is null)
-                return NotFound($"Company with ID: {companyId} not found.");
 
             var result = await companiesService.DeleteById(companyId);
 
