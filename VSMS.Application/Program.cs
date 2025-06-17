@@ -60,8 +60,6 @@ public abstract class Program
             builder.AddCompanyService();
             builder.AddStockService();
             
-            var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
