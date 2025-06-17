@@ -1,11 +1,7 @@
-using System.Text;
 using FluentValidation;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
-using VSMS.Company.Application;
-using VSMS.Identity.Application;
-using VSMS.Stock.Application;
+using VSMS.Infrastructure.Extensions;
 
 namespace VSMS.Application;
 
@@ -56,9 +52,9 @@ public abstract class Program
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.AddIdentityService();
-            builder.AddCompanyService();
-            builder.AddStockService();
+            builder.AddIdentityConfiguration();
+            builder.AddCompaniesConfiguration();
+            builder.AddStocksConfiguration();
             
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
