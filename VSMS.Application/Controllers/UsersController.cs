@@ -29,7 +29,7 @@ public class UsersController(
         try
         {
             var users = await userService.GetAllUserProfiles();
-            if (users is null)
+            if (users is null || !users.Any())
                 return NotFound();
             
             return Ok(users);
