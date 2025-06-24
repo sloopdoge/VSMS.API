@@ -38,7 +38,7 @@ public class AuthController(
                         Token = null,
                         Errors = [$"User with email: {model.Email} - not found"]
                     });
-            
+
             var isPasswordCorrect = await userService.IsPasswordCorrect(user, model.Password);
             if (!isPasswordCorrect)
                 return BadRequest(new LoginResultModel
@@ -48,7 +48,7 @@ public class AuthController(
                     Token = null,
                     Errors = ["Password is incorrect"]
                 });
-            
+
             var token = await userService.GenerateToken(user, model.UseLongLivedToken);
             if (string.IsNullOrEmpty(token.Value))
                 return BadRequest(new LoginResultModel
@@ -58,7 +58,7 @@ public class AuthController(
                     Token = null,
                     Errors = ["There was error creating token"]
                 });
-            
+
             return Ok(new LoginResultModel
             {
                 Success = true,
@@ -72,7 +72,7 @@ public class AuthController(
             return StatusCode(500, e.Message);
         }
     }
-    
+
     /// <summary>
     /// Method to register a user.
     /// </summary>
@@ -97,9 +97,9 @@ public class AuthController(
                     UserProfile = null,
                     Errors = [$"User with email: {model.Email} - already exist"]
                 });
-            
+
             var registerRes = await userService.RegisterUser(model);
-            
+
             return registerRes.Success
                 ? Ok(registerRes)
                 : BadRequest(registerRes);
