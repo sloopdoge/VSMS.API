@@ -110,27 +110,4 @@ public class AuthController(
             return StatusCode(500, e.Message);
         }
     }
-
-    /// <summary>
-    /// Method to validate token.
-    /// </summary>
-    /// <returns></returns>
-    [Authorize]
-    [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("Token/Validate")]
-    public async Task<IActionResult> ValidateToken()
-    {
-        try
-        {
-            return NoContent();
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-    }
 }
