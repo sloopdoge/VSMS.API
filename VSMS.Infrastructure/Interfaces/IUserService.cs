@@ -14,7 +14,6 @@ public interface IUserService
     
     #endregion
     
-    
     #region Users
     
     Task<ApplicationUser?> GetUserByEmail(string email);

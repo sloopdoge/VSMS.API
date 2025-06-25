@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
@@ -10,7 +11,8 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompaniesService(
     ILogger<CompaniesService> logger,
-    CompaniesDbContext context) : ICompaniesService
+    CompaniesDbContext context,
+    UserManager<ApplicationUser> userManager) : ICompaniesService
 {
     public async Task<CompanyDto> Create(CompanyDto model)
     {
@@ -76,8 +78,7 @@ public class CompaniesService(
             throw new Exception(e.Message, e);
         }
     }
-
-
+    
     public async Task<bool> DeleteById(Guid id)
     {
         try
@@ -101,10 +102,27 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await context.Companies.FindAsync(id);
+            var existingCompany = await context.Companies
+                .Include(c => c.Users)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(id);
+
+            var userProfiles = await Task.WhenAll(existingCompany.Users.Select(async user =>
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                return new UserProfileDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = roles.FirstOrDefault() ?? "None"
+                };
+            }));
 
             return new CompanyDto
             {
@@ -112,6 +130,7 @@ public class CompaniesService(
                 Title = existingCompany.Title,
                 CreatedAt = existingCompany.CreatedAt,
                 UpdatedAt = existingCompany.UpdatedAt,
+                UserProfiles = userProfiles.ToList(),
             };
         }
         catch (Exception e)

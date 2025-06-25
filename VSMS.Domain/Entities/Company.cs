@@ -10,6 +10,6 @@ public class Company
     public string NormalizedTitle { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    
-    public ICollection<ApplicationUser> Users { get; set; }
+
+    public ICollection<ApplicationUser> Users { get; set; } = [];
 }
