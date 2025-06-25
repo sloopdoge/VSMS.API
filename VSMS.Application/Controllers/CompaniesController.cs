@@ -11,7 +11,8 @@ namespace VSMS.Application.Controllers;
 [Route("[controller]")]
 public class CompaniesController(
     ILogger<CompaniesController> logger,
-    ICompaniesService companiesService) : ControllerBase
+    ICompaniesService companiesService,
+    ICompanyUsersService companyUsersService) : ControllerBase
 {
 
     /// <summary>
@@ -131,6 +132,118 @@ public class CompaniesController(
             return result
                 ? NoContent()
                 : StatusCode(418);
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound($"Company with ID: {companyId} not found.");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Assigns a user to the specified company.
+    /// </summary>
+    /// <param name="companyId">Company identifier.</param>
+    /// <param name="userId">User identifier.</param>
+    /// <returns>Boolean result of the assignment.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPost("{companyId:guid}/users/{userId:guid}")]
+    public async Task<IActionResult> AssignUserToCompany(Guid companyId, Guid userId)
+    {
+        try
+        {
+            if (companyId == Guid.Empty || userId == Guid.Empty)
+                return BadRequest("Company Id or User Id is empty.");
+
+            var result = await companyUsersService.AssignUserToCompany(userId, companyId);
+            return Ok(result);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound($"User with ID: {userId} not found.");
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound($"Company with ID: {companyId} not found.");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Removes a user from the specified company.
+    /// </summary>
+    /// <param name="companyId">Company identifier.</param>
+    /// <param name="userId">User identifier.</param>
+    /// <returns>Boolean indicating whether the unassignment succeeded.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpDelete("{companyId:guid}/users/{userId:guid}")]
+    public async Task<IActionResult> UnassignUserFromCompany(Guid companyId, Guid userId)
+    {
+        try
+        {
+            if (companyId == Guid.Empty || userId == Guid.Empty)
+                return BadRequest("Company Id or User Id is empty.");
+
+            var result = await companyUsersService.UnassignUserFromCompany(userId, companyId);
+            return Ok(result);
+        }
+        catch (UserNotFoundException)
+        {
+            return NotFound($"User with ID: {userId} not found.");
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound($"Company with ID: {companyId} not found.");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Gets all users assigned to the specified company.
+    /// </summary>
+    /// <param name="companyId">Company identifier.</param>
+    /// <returns>List of users in the company.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserProfileDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("{companyId:guid}/users")]
+    public async Task<IActionResult> GetAllUsersInCompany(Guid companyId)
+    {
+        try
+        {
+            if (companyId == Guid.Empty)
+                return BadRequest("Company Id is empty.");
+
+            var users = await companyUsersService.GetAllUsersInCompany(companyId);
+            return Ok(users);
         }
         catch (CompanyNotFoundException)
         {
