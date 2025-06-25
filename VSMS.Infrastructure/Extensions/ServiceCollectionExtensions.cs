@@ -81,10 +81,11 @@ public static class ServiceCollectionExtensions
         var environment = builder.Environment;
         
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<CompaniesDbContext>(options => 
+        services.AddDbContext<CompaniesDbContext>(options =>
             options.UseSqlServer(defaultConnectionString));
 
         services.AddScoped<ICompaniesService, CompaniesService>();
+        services.AddScoped<ICompanyUsersService, CompanyUsersService>();
 
         return builder;
     }
