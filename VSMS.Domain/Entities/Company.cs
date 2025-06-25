@@ -2,7 +2,6 @@
 
 namespace VSMS.Domain.Entities;
 
-[PrimaryKey(nameof(Id))]
 public class Company
 {
     public Guid Id { get; set; }
@@ -12,4 +11,5 @@ public class Company
     public DateTime UpdatedAt { get; set; }
 
     public ICollection<ApplicationUser> Users { get; set; } = [];
+    public ICollection<Stock> Stocks { get; set; } = [];
 }

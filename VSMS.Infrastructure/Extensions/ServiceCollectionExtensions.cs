@@ -22,12 +22,12 @@ public static class ServiceCollectionExtensions
         var environment = builder.Environment;
         
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<ApplicationDbContext>(options => 
+        services.AddDbContext<ApplicationRepository>(options => 
                 options.UseSqlServer(defaultConnectionString));
             
         services.AddIdentityCore<ApplicationUser>()
             .AddRoles<ApplicationRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddEntityFrameworkStores<ApplicationRepository>()
             .AddDefaultTokenProviders();
         
         var jwtSettings = configuration.GetSection("JwtSettings");
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
         var environment = builder.Environment;
         
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<CompaniesDbContext>(options =>
+        services.AddDbContext<CompaniesRepository>(options =>
             options.UseSqlServer(defaultConnectionString));
 
         services.AddScoped<ICompaniesService, CompaniesService>();

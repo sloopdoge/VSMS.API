@@ -12,7 +12,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class UserService(
     ILogger<UserService> logger, 
-    ApplicationDbContext context, 
+    ApplicationRepository context, 
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
     ITokenService tokenService) : IUserService

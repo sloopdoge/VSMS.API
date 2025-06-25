@@ -11,7 +11,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompanyUsersService(
     ILogger<CompanyUsersService> logger,
-    CompaniesDbContext companiesContext,
+    CompaniesRepository companiesContext,
     UserManager<ApplicationUser> userManager) : ICompanyUsersService
 {
     public async Task<bool> AssignUserToCompany(Guid userId, Guid companyId)

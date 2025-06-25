@@ -3,8 +3,8 @@ using VSMS.Domain.Entities;
 
 namespace VSMS.Repository;
 
-public class CompaniesDbContext(
-    DbContextOptions<CompaniesDbContext> options) : DbContext(options)
+public class CompaniesRepository(
+    DbContextOptions<CompaniesRepository> options) : DbContext(options)
 {
     public DbSet<Company> Companies { get; set; }
 

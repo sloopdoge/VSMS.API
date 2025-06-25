@@ -11,7 +11,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompaniesService(
     ILogger<CompaniesService> logger,
-    CompaniesDbContext context,
+    CompaniesRepository context,
     UserManager<ApplicationUser> userManager) : ICompaniesService
 {
     public async Task<CompanyDto> Create(CompanyDto model)

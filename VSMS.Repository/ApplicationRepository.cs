@@ -4,7 +4,7 @@ using VSMS.Domain.Entities;
 
 namespace VSMS.Repository;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+public class ApplicationRepository(DbContextOptions<ApplicationRepository> options)
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
 {
     protected override void OnModelCreating(ModelBuilder builder)
