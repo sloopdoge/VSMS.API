@@ -22,9 +22,10 @@ public class TokenService(ILogger<TokenService> logger, IConfiguration configura
 
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Email, user.Email),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Role, role.Name)
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Email, user.Email),
+                new(ClaimTypes.Role, role.Name),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

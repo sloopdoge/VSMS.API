@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
+using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
@@ -15,7 +16,7 @@ public class CompaniesService(
     {
         try
         {
-            var newCompany = new Domain.Entities.Company
+            var newCompany = new Company
             {
                 Id = Guid.NewGuid(),
                 Title = model.Title,
