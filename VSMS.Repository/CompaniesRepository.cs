@@ -10,18 +10,12 @@ public class CompaniesRepository(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Ignore<Stock>();
+        // Prevent EF Core from generating tables for user and stock entities
         modelBuilder.Ignore<ApplicationUser>();
+        modelBuilder.Ignore<Stock>();
 
-        modelBuilder.Entity<Company>()
-            .HasMany(c => c.Users)
-            .WithOne()
-            .HasForeignKey(u => u.CompanyId);
-
-        modelBuilder.Entity<Company>()
-            .HasMany(c => c.Stocks)
-            .WithOne(s => s.Company)
-            .HasForeignKey(s => s.CompanyId)
-            .OnDelete(DeleteBehavior.SetNull);
+        // Ignore navigation properties that belong to other contexts
+        modelBuilder.Entity<Company>().Ignore(c => c.Users);
+        modelBuilder.Entity<Company>().Ignore(c => c.Stocks);
     }
 }
