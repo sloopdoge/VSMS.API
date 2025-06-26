@@ -10,11 +10,9 @@ public class StocksRepository(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Exclude unrelated entities from this context
         modelBuilder.Ignore<ApplicationUser>();
         modelBuilder.Ignore<Company>();
 
-        // Ignore navigation properties that point to other contexts
         modelBuilder.Entity<Stock>().Ignore(s => s.Company);
 
         modelBuilder.Entity<Stock>()
