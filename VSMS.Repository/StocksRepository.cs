@@ -10,6 +10,9 @@ public class StocksRepository(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Ignore<Company>();
+        modelBuilder.Ignore<ApplicationUser>();
+
         modelBuilder.Entity<Stock>()
             .ToTable("Stocks",
                 s => s.IsTemporal(t =>

@@ -10,6 +10,9 @@ public class CompaniesRepository(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Ignore<Stock>();
+        modelBuilder.Ignore<ApplicationUser>();
+
         modelBuilder.Entity<Company>()
             .HasMany(c => c.Users)
             .WithOne()
