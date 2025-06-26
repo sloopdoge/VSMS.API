@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace VSMS.Domain.Entities;
+﻿namespace VSMS.Domain.Entities;
 
 public class Company
 {

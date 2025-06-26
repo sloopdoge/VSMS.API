@@ -11,7 +11,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompanyUsersService(
     ILogger<CompanyUsersService> logger,
-    CompaniesRepository companiesContext,
+    CompaniesRepository companiesRepository,
     UserManager<ApplicationUser> userManager) : ICompanyUsersService
 {
     public async Task<bool> AssignUserToCompany(Guid userId, Guid companyId)
@@ -22,7 +22,7 @@ public class CompanyUsersService(
             if (user is null)
                 throw new UserNotFoundException(userId);
 
-            var company = await companiesContext.Companies.FindAsync(companyId);
+            var company = await companiesRepository.Companies.FindAsync(companyId);
             if (company is null)
                 throw new CompanyNotFoundException(companyId);
 
@@ -47,7 +47,7 @@ public class CompanyUsersService(
             if (user is null)
                 throw new UserNotFoundException(userId);
 
-            var company = await companiesContext.Companies.FindAsync(companyId);
+            var company = await companiesRepository.Companies.FindAsync(companyId);
             if (company is null)
                 throw new CompanyNotFoundException(companyId);
 
@@ -71,7 +71,7 @@ public class CompanyUsersService(
     {
         try
         {
-            var company = await companiesContext.Companies
+            var company = await companiesRepository.Companies
                 .Include(c => c.Users)
                 .FirstOrDefaultAsync(c => c.Id == companyId);
 

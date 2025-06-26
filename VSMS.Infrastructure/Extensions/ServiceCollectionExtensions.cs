@@ -73,6 +73,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<StocksRepository>(options =>
             options.UseSqlServer(defaultConnectionString));
 
+        services.AddScoped<IStocksService, StocksService>();
+
         return builder;
     }
     

@@ -6,13 +6,11 @@ using VSMS.Domain.Entities;
 using VSMS.Domain.Models;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
-using VSMS.Repository;
 
 namespace VSMS.Infrastructure.Services;
 
 public class UserService(
     ILogger<UserService> logger, 
-    ApplicationRepository context, 
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
     ITokenService tokenService) : IUserService

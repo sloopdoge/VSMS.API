@@ -11,7 +11,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompaniesService(
     ILogger<CompaniesService> logger,
-    CompaniesRepository context,
+    CompaniesRepository companiesRepository,
     UserManager<ApplicationUser> userManager) : ICompaniesService
 {
     public async Task<CompanyDto> Create(CompanyDto model)
@@ -27,8 +27,8 @@ public class CompaniesService(
                 UpdatedAt = DateTime.UtcNow,
             };
             
-            var createResul = await context.Companies.AddAsync(newCompany);
-            var result = await context.SaveChangesAsync();
+            var createResul = await companiesRepository.Companies.AddAsync(newCompany);
+            var result = await companiesRepository.SaveChangesAsync();
             if (result < 1)
                 throw new Exception($"Company: {newCompany.Title} - was not created");
 
@@ -50,7 +50,7 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await context.Companies.FindAsync(model.Id);
+            var existingCompany = await companiesRepository.Companies.FindAsync(model.Id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(model.Id);
@@ -59,8 +59,8 @@ public class CompaniesService(
             existingCompany.NormalizedTitle = model.Title.Normalize();
             existingCompany.UpdatedAt = DateTime.UtcNow;
 
-            context.Companies.Update(existingCompany);
-            var result = await context.SaveChangesAsync();
+            companiesRepository.Companies.Update(existingCompany);
+            var result = await companiesRepository.SaveChangesAsync();
 
             if (result < 1)
                 throw new Exception($"Company: {model.Id} - was not updated");
@@ -83,13 +83,13 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await context.Companies.FindAsync(id);
+            var existingCompany = await companiesRepository.Companies.FindAsync(id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(id);
             
-            context.Companies.Remove(existingCompany);
-            var result = await context.SaveChangesAsync();
+            companiesRepository.Companies.Remove(existingCompany);
+            var result = await companiesRepository.SaveChangesAsync();
             return result > 0;
         }
         catch (Exception e)
@@ -102,7 +102,7 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await context.Companies
+            var existingCompany = await companiesRepository.Companies
                 .Include(c => c.Users)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -144,7 +144,7 @@ public class CompaniesService(
         try
         {
             var normalizedTitle = title.Normalize();
-            var result = await context.Companies.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
+            var result = await companiesRepository.Companies.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
             
             return result is not null;
         }
