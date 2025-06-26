@@ -2,14 +2,17 @@
 
 namespace VSMS.Domain.Entities;
 
-public class Company
+public class Stock
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
     public string NormalizedTitle { get; set; }
+    public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }
+    
     public DateTime UpdatedAt { get; set; }
-
-    public virtual ICollection<ApplicationUser> Users { get; set; } = [];
-    public virtual ICollection<Stock> Stocks { get; set; } = [];
+    public DateTime ValidTo { get; set; }
+    
+    public Guid? CompanyId { get; set; }
+    public Company? Company { get; set; }
 }

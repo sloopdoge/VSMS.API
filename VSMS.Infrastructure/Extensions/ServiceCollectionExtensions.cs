@@ -70,6 +70,8 @@ public static class ServiceCollectionExtensions
         var environment = builder.Environment;
         
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContext<StocksRepository>(options =>
+            options.UseSqlServer(defaultConnectionString));
 
         return builder;
     }
