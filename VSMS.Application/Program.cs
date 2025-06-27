@@ -1,9 +1,12 @@
 using FluentValidation;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Extensions;
+using VSMS.Infrastructure.Hubs;
 using VSMS.Infrastructure.Initializers;
 
 namespace VSMS.Application;
@@ -58,10 +61,31 @@ public abstract class Program
             builder.AddIdentityConfiguration();
             builder.AddCompaniesConfiguration();
             builder.AddStocksConfiguration();
+            builder.AddApplicationConfiguration();
             
+            builder.Services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(policy =>
+                        {
+                            policy.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        }
+                    );
+                }
+            );
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+            builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddSignalR();
+            
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new(@"/var/www/dataprotection-keys"))
+                .SetApplicationName("VSMS.API");
+            builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
+            
             var app = builder.Build();
             
             using (var scope = app.Services.CreateScope())
@@ -77,16 +101,26 @@ public abstract class Program
 
             app.UsePathBase($"/api");
             app.UseStaticFiles();
-            app.UseRouting();
             
             app.UseSwagger();
             app.UseSwaggerUI();
             
+            app.UseCors();
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseHttpsRedirection();
 
-            app.MapControllers();
+            app.UseForwardedHeaders(new()
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<ApplicationHub>("/ApplicationHub");
+            });
             
             app.Run();
         }

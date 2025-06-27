@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using VSMS.Domain.Constants;
 using VSMS.Domain.Entities;
+using VSMS.Infrastructure.Hubs;
 using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Services;
@@ -102,6 +103,17 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ICompaniesService, CompaniesService>();
         services.AddScoped<ICompanyUsersService, CompanyUsersService>();
+
+        return builder;
+    }
+    
+    public static WebApplicationBuilder AddApplicationConfiguration(this WebApplicationBuilder builder)
+    {
+        var services = builder.Services;
+        var configuration = builder.Configuration;
+        var environment = builder.Environment;
+
+        services.AddScoped<ApplicationHub>();
 
         return builder;
     }
