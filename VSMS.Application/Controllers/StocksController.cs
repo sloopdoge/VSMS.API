@@ -4,6 +4,7 @@ using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
+using VSMS.Infrastructure.Identity;
 
 namespace VSMS.Application.Controllers;
 
@@ -12,7 +13,8 @@ namespace VSMS.Application.Controllers;
 [Route("[controller]")]
 public class StocksController(
     ILogger<StocksController> logger,
-    IStocksService stocksService) : ControllerBase
+    IStocksService stocksService,
+    IAuthorizationService authorizationService) : ControllerBase
 {
     /// <summary>
     /// Retrieves a stock by its identifier.
@@ -87,6 +89,11 @@ public class StocksController(
     {
         try
         {
+            var authResult = await authorizationService.AuthorizeAsync(User,
+                model.CompanyId ?? Guid.Empty, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
+
             var stock = await stocksService.Create(model);
             return Ok(stock);
         }
@@ -117,6 +124,10 @@ public class StocksController(
         {
             if (stockId == Guid.Empty)
                 return BadRequest("Stock Id is empty.");
+            var authResult = await authorizationService.AuthorizeAsync(User,
+                model.CompanyId ?? Guid.Empty, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var updated = await stocksService.Update(model);
             return Ok(updated);
@@ -152,6 +163,12 @@ public class StocksController(
         {
             if (stockId == Guid.Empty)
                 return BadRequest("Stock Id is empty.");
+
+            var stock = await stocksService.GetById(stockId);
+            var authResult = await authorizationService.AuthorizeAsync(User,
+                stock.CompanyId ?? Guid.Empty, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var result = await stocksService.DeleteById(stockId);
             return result ? NoContent() : StatusCode(418);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
@@ -157,7 +158,8 @@ public class StocksService(
     {
         try
         {
-            var stock = await stocksRepository.Stocks.FindAsync(id);
+            var stock = stocksRepository.Stocks.Local.FirstOrDefault(s => s.Id == id)
+                        ?? await stocksRepository.Stocks.FindAsync(id);
             if (stock is null)
                 throw new StockNotFoundException(id);
 
