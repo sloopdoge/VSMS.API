@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using VSMS.Domain.Constants;
 using VSMS.Domain.Entities;
+using VSMS.Domain.Exceptions;
 
 namespace VSMS.Infrastructure.Identity;
 
@@ -18,7 +19,7 @@ public class CompanyOwnershipHandler(UserManager<ApplicationUser> userManager) :
         var user = await userManager.FindByIdAsync(userId);
 
         if (user is null)
-            return;
+            throw new UserNotFoundException(userId);
 
         if (await userManager.IsInRoleAsync(user, RoleNames.Admin))
         {
