@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
+using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Application.Controllers;
@@ -13,7 +14,8 @@ namespace VSMS.Application.Controllers;
 public class CompaniesController(
     ILogger<CompaniesController> logger,
     ICompaniesService companiesService,
-    ICompanyUsersService companyUsersService) : ControllerBase
+    ICompanyUsersService companyUsersService,
+    IAuthorizationService authorizationService) : ControllerBase
 {
 
     /// <summary>
@@ -93,6 +95,11 @@ public class CompaniesController(
             if (companyId == Guid.Empty)
                 return BadRequest("Company Id is empty.");
             
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
+            
             var updatedCompany = await companiesService.Update(model);
             return Ok(updatedCompany);
         }
@@ -127,6 +134,11 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty)
                 return BadRequest("Company Id is empty.");
+            
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var result = await companiesService.DeleteById(companyId);
 
@@ -165,6 +177,11 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty || userId == Guid.Empty)
                 return BadRequest("Company Id or User Id is empty.");
+            
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var result = await companyUsersService.AssignUserToCompany(userId, companyId);
             return Ok(result);
@@ -204,6 +221,11 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty || userId == Guid.Empty)
                 return BadRequest("Company Id or User Id is empty.");
+            
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var result = await companyUsersService.UnassignUserFromCompany(userId, companyId);
             return Ok(result);
@@ -242,6 +264,11 @@ public class CompaniesController(
         {
             if (companyId == Guid.Empty)
                 return BadRequest("Company Id is empty.");
+            
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
 
             var users = await companyUsersService.GetAllUsersInCompany(companyId);
             return Ok(users);

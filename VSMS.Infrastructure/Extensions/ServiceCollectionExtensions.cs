@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using VSMS.Domain.Constants;
 using VSMS.Domain.Entities;
+using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Services;
 using VSMS.Repository;
@@ -68,6 +70,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthorizationHandler, CompanyOwnershipHandler>();
         
         return builder;
     }

@@ -4,7 +4,6 @@ using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
-using VSMS.Infrastructure.Extensions;
 using VSMS.Repository;
 
 namespace VSMS.Infrastructure.Services;

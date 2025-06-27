@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using VSMS.Domain;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
