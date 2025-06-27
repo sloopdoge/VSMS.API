@@ -82,7 +82,7 @@ public abstract class Program
             builder.Services.AddSignalR();
             
             builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new(@"/var/www/dataprotection-keys"))
+                .PersistKeysToFileSystem(new(@"/var/www/vsms_api_dataprotection_keys"))
                 .SetApplicationName("VSMS.API");
             builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
             
