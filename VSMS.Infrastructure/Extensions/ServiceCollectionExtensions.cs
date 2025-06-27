@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using VSMS.Domain.Constants;
 using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Services;
@@ -55,7 +56,15 @@ public static class ServiceCollectionExtensions
                 };
             });
         
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(PolicyNames.AdminOnly, 
+                policy => policy.RequireRole(RoleNames.Admin));
+            options.AddPolicy(PolicyNames.AdminOrCompanyAdmin, 
+                policy => policy.RequireRole(RoleNames.Admin, RoleNames.CompanyAdmin));
+            options.AddPolicy(PolicyNames.AdminOrCompanyAdminOrManager, 
+                policy => policy.RequireRole(RoleNames.Admin, RoleNames.CompanyAdmin, RoleNames.CompanyManager));
+        });
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>();

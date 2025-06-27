@@ -1,4 +1,4 @@
-﻿namespace VSMS.Domain;
+﻿namespace VSMS.Domain.Constants;
 
 public static class RoleNames
 {

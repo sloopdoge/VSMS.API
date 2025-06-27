@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
@@ -76,7 +77,7 @@ public class StocksController(
     /// </summary>
     /// <param name="model">Stock model.</param>
     /// <returns>Created <see cref="StockDto"/>.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StockDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -102,7 +103,7 @@ public class StocksController(
     /// <param name="stockId">Stock identifier.</param>
     /// <param name="model">Updated stock model.</param>
     /// <returns>Updated <see cref="StockDto"/>.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StockDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -136,7 +137,7 @@ public class StocksController(
     /// </summary>
     /// <param name="stockId">Stock identifier.</param>
     /// <returns>Indicates whether deletion succeeded.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

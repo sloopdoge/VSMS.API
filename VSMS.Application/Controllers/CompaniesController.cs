@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
@@ -50,7 +51,7 @@ public class CompaniesController(
     /// </summary>
     /// <param name="model">Company model.</param>
     /// <returns>Created Company model.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOnly)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CompanyDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -77,7 +78,7 @@ public class CompaniesController(
     /// <param name="companyId">Company ID.</param>
     /// <param name="model">Updated Company model.</param>
     /// <returns>Updated Company model.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CompanyDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -111,7 +112,7 @@ public class CompaniesController(
     /// </summary>
     /// <param name="companyId">Company ID.</param>
     /// <returns>Indicates whether the deletion succeeded.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOnly)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -150,7 +151,7 @@ public class CompaniesController(
     /// <param name="companyId">Company identifier.</param>
     /// <param name="userId">User identifier.</param>
     /// <returns>Boolean result of the assignment.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -189,7 +190,7 @@ public class CompaniesController(
     /// <param name="companyId">Company identifier.</param>
     /// <param name="userId">User identifier.</param>
     /// <returns>Boolean indicating whether the unassignment succeeded.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -227,7 +228,7 @@ public class CompaniesController(
     /// </summary>
     /// <param name="companyId">Company identifier.</param>
     /// <returns>List of users in the company.</returns>
-    [Authorize]
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserProfileDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
