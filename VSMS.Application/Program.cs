@@ -78,12 +78,10 @@ public abstract class Program
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             builder.Services.AddHttpContextAccessor();
-
-            builder.Services.AddSignalR();
+            builder.Services.AddDataProtection();
             
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new(@"/var/www/vsms_api_dataprotection_keys"))
-                .SetApplicationName("VSMS.API");
+            builder.Services.AddSignalR();
+
             builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
             
             var app = builder.Build();
