@@ -7,7 +7,7 @@ using VSMS.Infrastructure.Interfaces;
 namespace VSMS.Application.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AuthController(
     ILogger<AuthController> logger,
     IUserService userService) : ControllerBase

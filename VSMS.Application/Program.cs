@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
+using VSMS.Application.Swagger;
 using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Hubs;
@@ -55,9 +56,8 @@ public abstract class Program
         Log.Warning("Starting web host");
         try
         {
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
+            builder.AddSwaggerConfiguration();
+            
             builder.AddIdentityConfiguration();
             builder.AddCompaniesConfiguration();
             builder.AddStocksConfiguration();
@@ -99,7 +99,6 @@ public abstract class Program
                 await UserInitializer.Initialize(userManager, logger);
             }
 
-            app.UsePathBase($"/api");
             app.UseStaticFiles();
             
             app.UseSwagger();
@@ -119,7 +118,7 @@ public abstract class Program
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ApplicationHub>("/ApplicationHub");
+                endpoints.MapHub<ApplicationHub>("api/ApplicationHub");
             });
             
             app.Run();

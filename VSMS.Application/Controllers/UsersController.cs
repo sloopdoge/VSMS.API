@@ -9,7 +9,7 @@ namespace VSMS.Application.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class UsersController(
     ILogger<UsersController> logger,
     IUserService userService) : ControllerBase

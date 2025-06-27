@@ -17,7 +17,7 @@ using VSMS.Repository;
 
 namespace VSMS.Infrastructure.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class InfrastructureCollectionExtensions
 {
     public static WebApplicationBuilder AddIdentityConfiguration(this WebApplicationBuilder builder)
     {

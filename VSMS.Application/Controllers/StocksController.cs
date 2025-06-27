@@ -10,7 +10,7 @@ namespace VSMS.Application.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class StocksController(
     ILogger<StocksController> logger,
     IStocksService stocksService,
