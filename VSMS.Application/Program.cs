@@ -1,13 +1,16 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
+using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Extensions;
+using VSMS.Infrastructure.Initializers;
 
 namespace VSMS.Application;
 
 public abstract class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +63,17 @@ public abstract class Program
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             var app = builder.Build();
+            
+            using (var scope = app.Services.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+                await RoleInitializer.Initialize(roleManager, logger);
+                
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                await UserInitializer.Initialize(userManager, logger);
+            }
 
             app.UsePathBase($"/api");
             app.UseStaticFiles();
