@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Models;
 
@@ -20,5 +21,5 @@ public interface ITokenService
     /// </summary>
     /// <param name="token">Token to validate.</param>
     /// <returns>The token's <see cref="ClaimsPrincipal"/> when validation succeeds; otherwise <c>null</c>.</returns>
-    ClaimsPrincipal? ValidateToken(string token);
+    TokenValidationResultModel ValidateToken(string token);
 }

@@ -10,7 +10,8 @@ namespace VSMS.Application.Controllers;
 [Route("api/[controller]")]
 public class AuthController(
     ILogger<AuthController> logger,
-    IUserService userService) : ControllerBase
+    IUserService userService,
+    ITokenService tokenService) : ControllerBase
 {
     /// <summary>
     /// Method for login.
@@ -103,6 +104,46 @@ public class AuthController(
             return registerRes.Success
                 ? Ok(registerRes)
                 : BadRequest(registerRes);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Validates the JWT access token provided in the Authorization header.
+    /// </summary>
+    /// <returns>200 OK with validation result, or an appropriate error code.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TokenValidationResultModel))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("Token/Validate")]
+    public async Task<IActionResult> ValidateToken()
+    {
+        try
+        {
+            var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                return Unauthorized(new TokenValidationResultModel
+                {
+                    IsValid = false,
+                    Error = "Authorization header is missing or malformed."
+                });
+
+            var token = authHeader["Bearer ".Length..].Trim();
+
+            var result = tokenService.ValidateToken(token);
+
+            if (!result.IsValid)
+                return Unauthorized(result);
+
+            return Ok(result);
         }
         catch (Exception e)
         {

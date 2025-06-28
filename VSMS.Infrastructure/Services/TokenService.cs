@@ -10,7 +10,9 @@ using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Infrastructure.Services;
 
-public class TokenService(ILogger<TokenService> logger, IConfiguration configuration) : ITokenService
+public class TokenService(
+    ILogger<TokenService> logger, 
+    IConfiguration configuration) : ITokenService
 {
     public TokenModel GenerateToken(ApplicationUser user, ApplicationRole role, bool rememberMe)
     {
@@ -56,7 +58,7 @@ public class TokenService(ILogger<TokenService> logger, IConfiguration configura
         }
     }
 
-    public ClaimsPrincipal? ValidateToken(string token)
+    public TokenValidationResultModel ValidateToken(string token)
     {
         try
         {
@@ -81,19 +83,25 @@ public class TokenService(ILogger<TokenService> logger, IConfiguration configura
             };
 
             var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-            
+
             if (validatedToken is JwtSecurityToken jwtToken &&
                 jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
-                return principal;
+                return new TokenValidationResultModel { IsValid = true, Principal = principal };
             }
 
-            return null;
+            return new TokenValidationResultModel { IsValid = false, Error = "Invalid algorithm" };
+        }
+        catch (SecurityTokenExpiredException ex)
+        {
+            logger.LogWarning("Token expired: {Message}", ex.Message);
+            return new TokenValidationResultModel { IsValid = false, Error = "Token expired" };
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Token validation failed.");
-            return null;
-        };
+            return new TokenValidationResultModel { IsValid = false, Error = ex.Message };
+        }
     }
+
 }
