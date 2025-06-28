@@ -117,12 +117,12 @@ public class StocksController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpPut("{stockId:guid}")]
-    public async Task<IActionResult> UpdateStock(Guid stockId, [FromBody] StockDto model)
+    [HttpPut]
+    public async Task<IActionResult> UpdateStock([FromBody] StockDto model)
     {
         try
         {
-            if (stockId == Guid.Empty)
+            if (model.Id == Guid.Empty)
                 return BadRequest("Stock Id is empty.");
             var authResult = await authorizationService.AuthorizeAsync(User,
                 model.CompanyId ?? Guid.Empty, new CompanyOwnershipRequirement());
@@ -134,7 +134,7 @@ public class StocksController(
         }
         catch (StockNotFoundException)
         {
-            return NotFound($"Stock with ID: {stockId} not found.");
+            return NotFound($"Stock with ID: {model.Id} not found.");
         }
         catch (Exception e)
         {
