@@ -22,6 +22,8 @@ public class StocksService(
                 Id = Guid.NewGuid(),
                 Title = stock.Title,
                 NormalizedTitle = stock.Title.Normalize(),
+                Symbol = stock.Symbol,
+                NormalizedSymbol = stock.Symbol.Normalize(),
                 Price = stock.Price,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -37,6 +39,7 @@ public class StocksService(
             {
                 Id = createResult.Entity.Id,
                 Title = createResult.Entity.Title,
+                Symbol = createResult.Entity.Symbol,
                 Price = createResult.Entity.Price,
                 CreatedAt = createResult.Entity.CreatedAt,
                 UpdatedAt = createResult.Entity.UpdatedAt,
@@ -59,6 +62,8 @@ public class StocksService(
 
             existingStock.Title = stock.Title;
             existingStock.NormalizedTitle = stock.Title.Normalize();
+            existingStock.Symbol = stock.Symbol;
+            existingStock.NormalizedSymbol = stock.Symbol.Normalize();
             existingStock.Price = stock.Price;
             existingStock.UpdatedAt = DateTime.UtcNow;
             existingStock.CompanyId = stock.CompanyId;
@@ -72,6 +77,7 @@ public class StocksService(
             {
                 Id = existingStock.Id,
                 Title = existingStock.Title,
+                Symbol = existingStock.Symbol,
                 Price = existingStock.Price,
                 CreatedAt = existingStock.CreatedAt,
                 UpdatedAt = existingStock.UpdatedAt,
@@ -96,6 +102,7 @@ public class StocksService(
             {
                 Id = stock.Id,
                 Title = stock.Title,
+                Symbol = stock.Symbol,
                 Price = stock.Price,
                 CreatedAt = stock.CreatedAt,
                 UpdatedAt = stock.UpdatedAt,
@@ -121,6 +128,7 @@ public class StocksService(
             {
                 Id = stock.Id,
                 Title = stock.Title,
+                Symbol = stock.Symbol,
                 Price = stock.Price,
                 CreatedAt = stock.CreatedAt,
                 UpdatedAt = stock.UpdatedAt,
@@ -142,6 +150,7 @@ public class StocksService(
             {
                 Id = s.Id,
                 Title = s.Title,
+                Symbol = s.Symbol,
                 Price = s.Price,
                 CreatedAt = s.CreatedAt,
                 UpdatedAt = s.UpdatedAt,
@@ -183,6 +192,7 @@ public class StocksService(
                 {
                     Id = s.Id,
                     Title = s.Title,
+                    Symbol = s.Symbol,
                     Price = s.Price,
                     CreatedAt = s.CreatedAt,
                     UpdatedAt = s.UpdatedAt,
@@ -215,6 +225,7 @@ public class StocksService(
             {
                 Id = currentStock.Id,
                 Title = currentStock.Title,
+                Symbol = currentStock.Symbol,
                 Price = currentStock.Price,
                 CreatedAt = currentStock.CreatedAt,
                 UpdatedAt = currentStock.UpdatedAt,
@@ -248,6 +259,7 @@ public class StocksService(
                 {
                     Id = currentStock.Id,
                     Title = currentStock.Title,
+                    Symbol = currentStock.Symbol,
                     Price = currentStock.Price,
                     CreatedAt = currentStock.CreatedAt,
                     UpdatedAt = currentStock.UpdatedAt,
@@ -286,6 +298,7 @@ public class StocksService(
                 {
                     Id = currentStock.Id,
                     Title = currentStock.Title,
+                    Symbol = currentStock.Symbol,
                     Price = currentStock.Price,
                     CreatedAt = currentStock.CreatedAt,
                     UpdatedAt = currentStock.UpdatedAt,
