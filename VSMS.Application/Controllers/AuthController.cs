@@ -59,7 +59,7 @@ public class AuthController(
             if (!isPasswordCorrect)
             {
                 loginResult.Success = false;
-                loginResult.Errors.Add(nameof(model.Email), $"Password is incorrect");
+                loginResult.Errors.Add(nameof(model.Password), $"Password is incorrect");
                 return BadRequest(loginResult);
             }
 
