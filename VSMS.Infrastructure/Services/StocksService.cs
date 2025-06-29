@@ -315,6 +315,38 @@ public class StocksService(
         }
     }
 
+    public async Task<List<StockDto>?> GetHistoryById(Guid stockId, DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            var stock = await stocksRepository.Stocks
+                .FirstOrDefaultAsync(s => s.Id == stockId);
+            if (stock is null)
+                throw new StockNotFoundException(stockId);
+            
+            var stockHistory = await stocksRepository.Stocks
+                .TemporalFromTo(startDate, endDate)
+                .Where(s => s.Id == stock.Id)
+                .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
+                .ToListAsync();
+            
+            return stockHistory.Select(s => new StockDto
+            {
+                Id = s.Id,
+                Title = s.Title,
+                Symbol = s.Symbol,
+                Price = s.Price,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                CompanyId = s.CompanyId
+            }).ToList();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
     public async Task<bool> IsTitleExists(string title)
     {
         try

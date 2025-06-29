@@ -55,4 +55,5 @@ public interface IStocksService
     Task<StockPerformanceDto> GetStockPerformanceById(Guid stockId);
     Task<List<StockPerformanceDto>> GetAllStocksPerformance();
     Task<List<StockPerformanceDto>> GetStocksPerformanceByCompanyId(Guid companyId);
+    Task<List<StockDto>?> GetHistoryById(Guid stockId, DateTime startDate, DateTime endDate);
 }
