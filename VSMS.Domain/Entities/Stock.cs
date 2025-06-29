@@ -7,10 +7,7 @@ public class Stock
     public string NormalizedTitle { get; set; }
     public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }
-    
     public DateTime UpdatedAt { get; set; }
-    public DateTime ValidTo { get; set; }
-    
     public Guid? CompanyId { get; set; }
     public Company? Company { get; set; }
 }

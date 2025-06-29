@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
+using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Identity;
@@ -14,7 +15,8 @@ namespace VSMS.Application.Controllers;
 public class StocksController(
     ILogger<StocksController> logger,
     IStocksService stocksService,
-    IAuthorizationService authorizationService) : ControllerBase
+    IAuthorizationService authorizationService,
+    ICompaniesService companiesService) : ControllerBase
 {
     /// <summary>
     /// Retrieves a stock by its identifier.
@@ -32,12 +34,15 @@ public class StocksController(
     {
         try
         {
+            if (stockId == Guid.Empty)
+                return BadRequest("Incorrect input data");
+            
             var stock = await stocksService.GetById(stockId);
             return Ok(stock);
         }
-        catch (StockNotFoundException)
+        catch (StockNotFoundException e)
         {
-            return NotFound();
+            return NotFound(e.Message);
         }
         catch (Exception e)
         {
@@ -62,10 +67,45 @@ public class StocksController(
         try
         {
             var stocks = await stocksService.GetAll();
-            if (stocks is null || !stocks.Any())
+            return Ok(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    /// <summary>
+    /// Retrieves all available company stocks.
+    /// </summary>
+    /// <returns>List of <see cref="StockDto"/>.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<StockDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("Company/{companyId:guid}")]
+    public async Task<IActionResult> GetAllCompanyStocks(Guid companyId)
+    {
+        try
+        {
+            if(companyId == Guid.Empty)
+                return BadRequest("Incorrect input data");
+            
+            var company = await companiesService.GetById(companyId);
+
+            var stocks = await stocksService.GetByCompanyId(company.Id);
+            if (!stocks.Any())
                 return NotFound();
 
             return Ok(stocks);
+        }
+        catch (CompanyNotFoundException e)
+        {
+            logger.LogError(e.Message);
+            return NotFound(e.Message);
         }
         catch (Exception e)
         {
@@ -122,8 +162,6 @@ public class StocksController(
     {
         try
         {
-            if (model.Id == Guid.Empty)
-                return BadRequest("Stock Id is empty.");
             var authResult = await authorizationService.AuthorizeAsync(User,
                 model.CompanyId ?? Guid.Empty, new CompanyOwnershipRequirement());
             if (!authResult.Succeeded)
@@ -162,7 +200,7 @@ public class StocksController(
         try
         {
             if (stockId == Guid.Empty)
-                return BadRequest("Stock Id is empty.");
+                return BadRequest("Incorrect input data");
 
             var stock = await stocksService.GetById(stockId);
             var authResult = await authorizationService.AuthorizeAsync(User,
@@ -180,6 +218,76 @@ public class StocksController(
         catch (Exception e)
         {
             logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StockPerformanceDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("StocksPerformance/{stockId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetStockPerformanceById(Guid stockId)
+    {
+        try
+        {
+            if (stockId == Guid.Empty)
+                return BadRequest("Incorrect input data");
+            
+            var stock = await stocksService.GetStockPerformanceById(stockId);
+
+            return Ok(stock);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<StockPerformanceDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("StocksPerformance")]
+    [Authorize]
+    public async Task<IActionResult> GetAllStocksPerformance()
+    {
+        try
+        {
+            var stocks = await stocksService.GetAllStocksPerformance();
+
+            return Ok(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<StockPerformanceDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("StocksPerformance/Company/{companyId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetAllCompanyStocksPerformance(Guid companyId)
+    {
+        try
+        {
+            if (companyId == Guid.Empty)
+                return BadRequest("Incorrect input data");
+            
+            var stocks = await stocksService.GetStocksPerformanceByCompanyId(companyId);
+
+            return Ok(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
             return StatusCode(500, e.Message);
         }
     }

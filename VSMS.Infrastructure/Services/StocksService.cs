@@ -172,13 +172,144 @@ public class StocksService(
             throw new Exception(e.Message, e);
         }
     }
-    
+
+    public async Task<List<StockDto>> GetByCompanyId(Guid companyId)
+    {
+        try
+        {
+            var stocks = await stocksRepository.Stocks
+                .Where(s => s.CompanyId == companyId)
+                .Select(s => new StockDto
+                {
+                    Id = s.Id,
+                    Title = s.Title,
+                    Price = s.Price,
+                    CreatedAt = s.CreatedAt,
+                    UpdatedAt = s.UpdatedAt,
+                    CompanyId = s.CompanyId
+                }).ToListAsync();
+            return stocks;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<StockPerformanceDto> GetStockPerformanceById(Guid stockId)
+    {
+        try
+        {
+            var currentStock = await stocksRepository.Stocks
+                .FirstOrDefaultAsync(s => s.Id == stockId);
+            if (currentStock is null)
+                throw new StockNotFoundException(stockId);
+            
+            var previousStock = await stocksRepository.Stocks
+                .TemporalAll()
+                .Where(s => s.Id == currentStock.Id)
+                .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
+                .FirstOrDefaultAsync();
+            
+            return new StockPerformanceDto
+            {
+                Id = currentStock.Id,
+                Title = currentStock.Title,
+                Price = currentStock.Price,
+                CreatedAt = currentStock.CreatedAt,
+                UpdatedAt = currentStock.UpdatedAt,
+                CompanyId = currentStock.CompanyId,
+                PreviousPrice = previousStock?.Price
+            };
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<List<StockPerformanceDto>> GetAllStocksPerformance()
+    {
+        try
+        {
+            var stocksPerformance = new List<StockPerformanceDto>();
+            
+            var currentStocks = await stocksRepository.Stocks.ToListAsync();
+            
+            foreach (var currentStock in currentStocks)
+            {
+                var previous = await stocksRepository.Stocks
+                    .TemporalAll()
+                    .Where(s => s.Id == currentStock.Id)
+                    .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
+                    .FirstOrDefaultAsync();
+                
+                stocksPerformance.Add(new StockPerformanceDto
+                {
+                    Id = currentStock.Id,
+                    Title = currentStock.Title,
+                    Price = currentStock.Price,
+                    CreatedAt = currentStock.CreatedAt,
+                    UpdatedAt = currentStock.UpdatedAt,
+                    CompanyId = currentStock.CompanyId,
+                    PreviousPrice = previous?.Price
+                });
+            }
+            
+            return stocksPerformance;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<List<StockPerformanceDto>> GetStocksPerformanceByCompanyId(Guid companyId)
+    {
+        try
+        {
+            var stocksPerformance = new List<StockPerformanceDto>();
+
+            var currentStocks = await stocksRepository.Stocks
+                .Where(s => s.CompanyId == companyId)
+                .ToListAsync();
+            
+            foreach (var currentStock in currentStocks)
+            {
+                var previous = await stocksRepository.Stocks
+                    .TemporalAll()
+                    .Where(s => s.Id == currentStock.Id && s.CompanyId == currentStock.CompanyId)
+                    .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
+                    .FirstOrDefaultAsync();
+                
+                stocksPerformance.Add(new StockPerformanceDto
+                {
+                    Id = currentStock.Id,
+                    Title = currentStock.Title,
+                    Price = currentStock.Price,
+                    CreatedAt = currentStock.CreatedAt,
+                    UpdatedAt = currentStock.UpdatedAt,
+                    CompanyId = currentStock.CompanyId,
+                    PreviousPrice = previous?.Price
+                });
+            }
+            
+            return stocksPerformance;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
     public async Task<bool> IsTitleExists(string title)
     {
         try
         {
             var normalizedTitle = title.Normalize();
-            var result = await stocksRepository.Stocks.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
+            var result = await stocksRepository.Stocks
+                .Where(c => c.NormalizedTitle == normalizedTitle)
+                .FirstOrDefaultAsync();
             
             return result is not null;
         }

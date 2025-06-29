@@ -47,6 +47,45 @@ public class CompaniesController(
             return StatusCode(500, e.Message);
         }
     }
+    
+    /// <summary>
+    /// Gets all users assigned to the specified company.
+    /// </summary>
+    /// <param name="companyId">Company identifier.</param>
+    /// <returns>List of users in the company.</returns>
+    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserProfileDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("{companyId:guid}/users")]
+    public async Task<IActionResult> GetAllUsersInCompany(Guid companyId)
+    {
+        try
+        {
+            if (companyId == Guid.Empty)
+                return BadRequest("Company Id is empty.");
+            
+            var authResult = await authorizationService.AuthorizeAsync(User, 
+                companyId, new CompanyOwnershipRequirement());
+            if (!authResult.Succeeded)
+                return Forbid();
+
+            var users = await companyUsersService.GetAllUsersInCompany(companyId);
+            return Ok(users);
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound($"Company with ID: {companyId} not found.");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
 
     /// <summary>
     /// Method to create Company.
@@ -128,7 +167,7 @@ public class CompaniesController(
     [ProducesResponseType(StatusCodes.Status418ImATeapot)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [HttpDelete("{companyId:guid}")]
-    public async Task<IActionResult> DeleteCompany(Guid companyId)
+    public async Task<IActionResult> DeleteCompanyById(Guid companyId)
     {
         try
         {
@@ -244,44 +283,4 @@ public class CompaniesController(
             return StatusCode(500, e.Message);
         }
     }
-
-    /// <summary>
-    /// Gets all users assigned to the specified company.
-    /// </summary>
-    /// <param name="companyId">Company identifier.</param>
-    /// <returns>List of users in the company.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
-    [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserProfileDto>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("{companyId:guid}/users")]
-    public async Task<IActionResult> GetAllUsersInCompany(Guid companyId)
-    {
-        try
-        {
-            if (companyId == Guid.Empty)
-                return BadRequest("Company Id is empty.");
-            
-            var authResult = await authorizationService.AuthorizeAsync(User, 
-                companyId, new CompanyOwnershipRequirement());
-            if (!authResult.Succeeded)
-                return Forbid();
-
-            var users = await companyUsersService.GetAllUsersInCompany(companyId);
-            return Ok(users);
-        }
-        catch (CompanyNotFoundException)
-        {
-            return NotFound($"Company with ID: {companyId} not found.");
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-            return StatusCode(500, e.Message);
-        }
-    }
-
 }

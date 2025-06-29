@@ -1,4 +1,5 @@
 ﻿using VSMS.Domain.DTOs;
+using VSMS.Domain.Entities;
 
 namespace VSMS.Infrastructure.Interfaces;
 
@@ -33,7 +34,7 @@ public interface IStocksService
     Task<StockDto> GetByTitle(string title);
 
     /// <summary>
-    /// Gets all stocks.
+    /// Retrieves all available stocks.
     /// </summary>
     /// <returns>List of <see cref="StockDto"/>.</returns>
     Task<List<StockDto>> GetAll();
@@ -44,4 +45,14 @@ public interface IStocksService
     /// <param name="id">Stock identifier.</param>
     /// <returns><c>true</c> if the stock was deleted; otherwise <c>false</c>.</returns>
     Task<bool> DeleteById(Guid id);
+
+    /// <summary>
+    /// Retrieves all available company stocks.
+    /// </summary>
+    /// <returns>List of <see cref="StockDto"/>.</returns>
+    Task<List<StockDto>> GetByCompanyId(Guid companyId);
+
+    Task<StockPerformanceDto> GetStockPerformanceById(Guid stockId);
+    Task<List<StockPerformanceDto>> GetAllStocksPerformance();
+    Task<List<StockPerformanceDto>> GetStocksPerformanceByCompanyId(Guid companyId);
 }
