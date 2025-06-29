@@ -87,7 +87,7 @@ public class TokenService(
             if (validatedToken is JwtSecurityToken jwtToken &&
                 jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new TokenValidationResultModel { IsValid = true, Principal = principal };
+                return new TokenValidationResultModel { IsValid = true };
             }
 
             return new TokenValidationResultModel { IsValid = false, Error = "Invalid algorithm" };
