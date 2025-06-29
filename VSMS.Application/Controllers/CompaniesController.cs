@@ -19,10 +19,10 @@ public class CompaniesController(
 {
 
     /// <summary>
-    /// Method to get Company by id.
+    /// Retrieves details of a specific company using its identifier.
     /// </summary>
     /// <param name="companyId">Guid representation of Company ID.</param>
-    /// <returns>Model of Company.</returns>
+    /// <returns>The corresponding <see cref="CompanyDto"/>.</returns>
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CompanyDto))]
@@ -49,9 +49,9 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Retrieves all companies.
+    /// Returns a list of all companies stored in the system.
     /// </summary>
-    /// <returns>The list of <see cref="CompanyDto"/> if found.</returns>
+    /// <returns>Collection of <see cref="CompanyDto"/> items.</returns>
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CompanyDto>))]
@@ -78,7 +78,7 @@ public class CompaniesController(
     }
     
     /// <summary>
-    /// Gets all users assigned to the specified company.
+    /// Retrieves all user profiles that are linked to the given company.
     /// </summary>
     /// <param name="companyId">Company identifier.</param>
     /// <returns>List of users in the company.</returns>
@@ -117,10 +117,10 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Method to create Company.
+    /// Creates a new company using the provided data.
     /// </summary>
     /// <param name="model">Company model.</param>
-    /// <returns>Created Company model.</returns>
+    /// <returns>The created <see cref="CompanyDto"/>.</returns>
     [Authorize(Policy = PolicyNames.AdminOnly)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CompanyDto))]
@@ -143,11 +143,11 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Method to update Company.
+    /// Updates the details of an existing company.
     /// </summary>
     /// <param name="companyId">Company ID.</param>
     /// <param name="model">Updated Company model.</param>
-    /// <returns>Updated Company model.</returns>
+    /// <returns>The updated <see cref="CompanyDto"/>.</returns>
     [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CompanyDto))]
@@ -183,7 +183,7 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Method to Delete Company by ID.
+    /// Deletes the specified company from the database.
     /// </summary>
     /// <param name="companyId">Company ID.</param>
     /// <returns>Indicates whether the deletion succeeded.</returns>
@@ -226,7 +226,7 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Assigns a user to the specified company.
+    /// Links a user account to the given company.
     /// </summary>
     /// <param name="companyId">Company identifier.</param>
     /// <param name="userId">User identifier.</param>
@@ -270,7 +270,7 @@ public class CompaniesController(
     }
 
     /// <summary>
-    /// Removes a user from the specified company.
+    /// Unassigns a user from the given company.
     /// </summary>
     /// <param name="companyId">Company identifier.</param>
     /// <param name="userId">User identifier.</param>

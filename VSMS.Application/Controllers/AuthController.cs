@@ -14,10 +14,11 @@ public class AuthController(
     ITokenService tokenService) : ControllerBase
 {
     /// <summary>
-    /// Method for login.
+    /// Authenticates the user with the provided credentials and
+    /// returns a JWT token when successful.
     /// </summary>
-    /// <param name="model">Login model.</param>
-    /// <returns></returns>
+    /// <param name="model">User credentials.</param>
+    /// <returns>The result of the login attempt.</returns>
     [AllowAnonymous]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LoginResultModel))]
@@ -87,10 +88,10 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Method to register a user.
+    /// Creates a new user account with the provided registration data.
     /// </summary>
-    /// <param name="model">Register model.</param>
-    /// <returns></returns>
+    /// <param name="model">User registration information.</param>
+    /// <returns>The result of the registration process.</returns>
     [AllowAnonymous]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegisterResultModel))]
@@ -125,7 +126,7 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Validates the JWT access token provided in the Authorization header.
+    /// Validates the bearer token supplied in the request's Authorization header.
     /// </summary>
     /// <returns>200 OK with validation result, or an appropriate error code.</returns>
     [Authorize]
