@@ -11,7 +11,7 @@ namespace VSMS.Infrastructure.Services;
 
 public class StocksService(
     ILogger<StocksService> logger,
-    StocksRepository stocksRepository) : IStocksService
+    ApplicationRepository repository) : IStocksService
 {
     public async Task<StockDto> Create(StockDto stock)
     {
@@ -30,8 +30,8 @@ public class StocksService(
                 CompanyId = stock.CompanyId
             };
 
-            var createResult = await stocksRepository.Stocks.AddAsync(newStock);
-            var result = await stocksRepository.SaveChangesAsync();
+            var createResult = await repository.Stocks.AddAsync(newStock);
+            var result = await repository.SaveChangesAsync();
             if (result < 1)
                 throw new Exception($"Stock: {newStock.Title} - was not created");
 
@@ -56,7 +56,7 @@ public class StocksService(
     {
         try
         {
-            var existingStock = await stocksRepository.Stocks.FindAsync(stock.Id);
+            var existingStock = await repository.Stocks.FindAsync(stock.Id);
             if (existingStock is null)
                 throw new StockNotFoundException(stock.Id);
 
@@ -68,8 +68,8 @@ public class StocksService(
             existingStock.UpdatedAt = DateTime.UtcNow;
             existingStock.CompanyId = stock.CompanyId;
 
-            stocksRepository.Stocks.Update(existingStock);
-            var result = await stocksRepository.SaveChangesAsync();
+            repository.Stocks.Update(existingStock);
+            var result = await repository.SaveChangesAsync();
             if (result < 1)
                 throw new Exception($"Stock: {stock.Id} - was not updated");
 
@@ -94,7 +94,7 @@ public class StocksService(
     {
         try
         {
-            var stock = await stocksRepository.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+            var stock = await repository.Stocks.FirstOrDefaultAsync(s => s.Id == id);
             if (stock is null)
                 throw new StockNotFoundException(id);
 
@@ -120,7 +120,7 @@ public class StocksService(
         try
         {
             var normalizedTitle = title.Normalize();
-            var stock = await stocksRepository.Stocks.FirstOrDefaultAsync(s => s.NormalizedTitle == normalizedTitle);
+            var stock = await repository.Stocks.FirstOrDefaultAsync(s => s.NormalizedTitle == normalizedTitle);
             if (stock is null)
                 throw new Exception($"Stock with title '{title}' was not found.");
 
@@ -145,7 +145,7 @@ public class StocksService(
     {
         try
         {
-            var stocks = await stocksRepository.Stocks.ToListAsync();
+            var stocks = await repository.Stocks.ToListAsync();
             return stocks.Select(s => new StockDto
             {
                 Id = s.Id,
@@ -167,13 +167,13 @@ public class StocksService(
     {
         try
         {
-            var stock = stocksRepository.Stocks.Local.FirstOrDefault(s => s.Id == id)
-                        ?? await stocksRepository.Stocks.FindAsync(id);
+            var stock = repository.Stocks.Local.FirstOrDefault(s => s.Id == id)
+                        ?? await repository.Stocks.FindAsync(id);
             if (stock is null)
                 throw new StockNotFoundException(id);
 
-            stocksRepository.Stocks.Remove(stock);
-            var result = await stocksRepository.SaveChangesAsync();
+            repository.Stocks.Remove(stock);
+            var result = await repository.SaveChangesAsync();
             return result > 0;
         }
         catch (Exception e)
@@ -186,7 +186,7 @@ public class StocksService(
     {
         try
         {
-            var stocks = await stocksRepository.Stocks
+            var stocks = await repository.Stocks
                 .Where(s => s.CompanyId == companyId)
                 .Select(s => new StockDto
                 {
@@ -210,12 +210,12 @@ public class StocksService(
     {
         try
         {
-            var currentStock = await stocksRepository.Stocks
+            var currentStock = await repository.Stocks
                 .FirstOrDefaultAsync(s => s.Id == stockId);
             if (currentStock is null)
                 throw new StockNotFoundException(stockId);
             
-            var previousStock = await stocksRepository.Stocks
+            var previousStock = await repository.Stocks
                 .TemporalAll()
                 .Where(s => s.Id == currentStock.Id)
                 .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
@@ -245,11 +245,11 @@ public class StocksService(
         {
             var stocksPerformance = new List<StockPerformanceDto>();
             
-            var currentStocks = await stocksRepository.Stocks.ToListAsync();
+            var currentStocks = await repository.Stocks.ToListAsync();
             
             foreach (var currentStock in currentStocks)
             {
-                var previous = await stocksRepository.Stocks
+                var previous = await repository.Stocks
                     .TemporalAll()
                     .Where(s => s.Id == currentStock.Id)
                     .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
@@ -282,13 +282,13 @@ public class StocksService(
         {
             var stocksPerformance = new List<StockPerformanceDto>();
 
-            var currentStocks = await stocksRepository.Stocks
+            var currentStocks = await repository.Stocks
                 .Where(s => s.CompanyId == companyId)
                 .ToListAsync();
             
             foreach (var currentStock in currentStocks)
             {
-                var previous = await stocksRepository.Stocks
+                var previous = await repository.Stocks
                     .TemporalAll()
                     .Where(s => s.Id == currentStock.Id && s.CompanyId == currentStock.CompanyId)
                     .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
@@ -319,12 +319,12 @@ public class StocksService(
     {
         try
         {
-            var stock = await stocksRepository.Stocks
+            var stock = await repository.Stocks
                 .FirstOrDefaultAsync(s => s.Id == stockId);
             if (stock is null)
                 throw new StockNotFoundException(stockId);
             
-            var stockHistory = await stocksRepository.Stocks
+            var stockHistory = await repository.Stocks
                 .TemporalFromTo(startDate, endDate)
                 .Where(s => s.Id == stock.Id)
                 .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
@@ -352,7 +352,7 @@ public class StocksService(
         try
         {
             var normalizedTitle = title.Normalize();
-            var result = await stocksRepository.Stocks
+            var result = await repository.Stocks
                 .Where(c => c.NormalizedTitle == normalizedTitle)
                 .FirstOrDefaultAsync();
             

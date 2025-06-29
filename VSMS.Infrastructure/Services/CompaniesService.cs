@@ -11,8 +11,9 @@ namespace VSMS.Infrastructure.Services;
 
 public class CompaniesService(
     ILogger<CompaniesService> logger,
-    CompaniesRepository companiesRepository,
-    UserManager<ApplicationUser> userManager) : ICompaniesService
+    ApplicationRepository repository,
+    UserManager<ApplicationUser> userManager,
+    ICompanyUsersService companyUsersService) : ICompaniesService
 {
     public async Task<CompanyDto> Create(CompanyDto model)
     {
@@ -27,8 +28,8 @@ public class CompaniesService(
                 UpdatedAt = DateTime.UtcNow,
             };
             
-            var createResul = await companiesRepository.Companies.AddAsync(newCompany);
-            var result = await companiesRepository.SaveChangesAsync();
+            var createResul = await repository.Companies.AddAsync(newCompany);
+            var result = await repository.SaveChangesAsync();
             if (result < 1)
                 throw new Exception($"Company: {newCompany.Title} - was not created");
 
@@ -50,7 +51,7 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await companiesRepository.Companies.FindAsync(model.Id);
+            var existingCompany = await repository.Companies.FindAsync(model.Id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(model.Id);
@@ -59,8 +60,8 @@ public class CompaniesService(
             existingCompany.NormalizedTitle = model.Title.Normalize();
             existingCompany.UpdatedAt = DateTime.UtcNow;
 
-            companiesRepository.Companies.Update(existingCompany);
-            var result = await companiesRepository.SaveChangesAsync();
+            repository.Companies.Update(existingCompany);
+            var result = await repository.SaveChangesAsync();
 
             if (result < 1)
                 throw new Exception($"Company: {model.Id} - was not updated");
@@ -83,13 +84,13 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await companiesRepository.Companies.FindAsync(id);
+            var existingCompany = await repository.Companies.FindAsync(id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(id);
             
-            companiesRepository.Companies.Remove(existingCompany);
-            var result = await companiesRepository.SaveChangesAsync();
+            repository.Companies.Remove(existingCompany);
+            var result = await repository.SaveChangesAsync();
             return result > 0;
         }
         catch (Exception e)
@@ -102,36 +103,52 @@ public class CompaniesService(
     {
         try
         {
-            var existingCompany = await companiesRepository.Companies
-                .Include(c => c.Users)
+            var existingCompany = await repository.Companies
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (existingCompany is null)
                 throw new CompanyNotFoundException(id);
 
-            var userProfiles = await Task.WhenAll(existingCompany.Users.Select(async user =>
-            {
-                var roles = await userManager.GetRolesAsync(user);
-                return new UserProfileDto
-                {
-                    Id = user.Id,
-                    Username = user.UserName,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Role = roles.FirstOrDefault() ?? "None"
-                };
-            }));
-
-            return new CompanyDto
+            var result = new CompanyDto
             {
                 Id = existingCompany.Id,
                 Title = existingCompany.Title,
                 CreatedAt = existingCompany.CreatedAt,
                 UpdatedAt = existingCompany.UpdatedAt,
-                UserProfiles = userProfiles.ToList(),
+                UserProfiles = await companyUsersService.GetAllUsersInCompany(existingCompany.Id)
             };
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+    }
+
+    public async Task<List<CompanyDto>> GetAll()
+    {
+        try
+        {
+            var companies = await repository.Companies
+                .ToListAsync();
+
+            var result = companies.Select(c => new CompanyDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt,
+            }).ToList();
+
+            var tasks = result.Select(async company =>
+            {
+                company.UserProfiles = await companyUsersService.GetAllUsersInCompany(company.Id);
+            }).ToList();
+
+            await Task.WhenAll(tasks);
+
+            return result;
         }
         catch (Exception e)
         {
@@ -144,7 +161,7 @@ public class CompaniesService(
         try
         {
             var normalizedTitle = title.Normalize();
-            var result = await companiesRepository.Companies.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
+            var result = await repository.Companies.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
             
             return result is not null;
         }

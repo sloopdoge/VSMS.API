@@ -33,6 +33,12 @@ public interface ICompaniesService
     Task<CompanyDto> GetById(Guid id);
 
     /// <summary>
+    /// Retrieves all companies.
+    /// </summary>
+    /// <returns>The list of <see cref="CompanyDto"/> if found.</returns>
+    Task<List<CompanyDto>> GetAll();
+
+    /// <summary>
     /// Checks whether a company title already exists.
     /// </summary>
     /// <param name="title">Company title to check.</param>

@@ -47,6 +47,35 @@ public class CompaniesController(
             return StatusCode(500, e.Message);
         }
     }
+
+    /// <summary>
+    /// Retrieves all companies.
+    /// </summary>
+    /// <returns>The list of <see cref="CompanyDto"/> if found.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CompanyDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet]
+    public async Task<IActionResult> GetAllCompanies()
+    {
+        try
+        {
+            var company = await companiesService.GetAll();
+            return Ok(company);
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
     
     /// <summary>
     /// Gets all users assigned to the specified company.

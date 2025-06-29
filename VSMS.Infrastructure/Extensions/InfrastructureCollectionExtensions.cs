@@ -81,10 +81,6 @@ public static class InfrastructureCollectionExtensions
         var services = builder.Services;
         var configuration = builder.Configuration;
         var environment = builder.Environment;
-        
-        var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<StocksRepository>(options =>
-            options.UseSqlServer(defaultConnectionString));
 
         services.AddScoped<IStocksService, StocksService>();
 
@@ -96,10 +92,6 @@ public static class InfrastructureCollectionExtensions
         var services = builder.Services;
         var configuration = builder.Configuration;
         var environment = builder.Environment;
-        
-        var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<CompaniesRepository>(options =>
-            options.UseSqlServer(defaultConnectionString));
 
         services.AddScoped<ICompaniesService, CompaniesService>();
         services.AddScoped<ICompanyUsersService, CompanyUsersService>();
@@ -114,6 +106,7 @@ public static class InfrastructureCollectionExtensions
         var environment = builder.Environment;
 
         services.AddScoped<ApplicationHub>();
+        services.AddScoped<StocksHub>();
 
         return builder;
     }

@@ -8,4 +8,5 @@ public class ApplicationUser : IdentityUser<Guid>
     public string LastName { get; set; }
     
     public Guid? CompanyId { get; set; }
+    public virtual Company Company { get; set; }
 }
