@@ -116,7 +116,8 @@ public abstract class Program
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ApplicationHub>("api/ApplicationHub");
+                endpoints.MapHub<ApplicationHub>("ApplicationHub");
+                endpoints.MapHub<StocksHub>("StocksHub");
             });
             
             app.Run();
