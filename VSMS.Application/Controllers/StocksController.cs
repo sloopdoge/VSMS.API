@@ -19,11 +19,17 @@ public class StocksController(
     ICompaniesService companiesService) : ControllerBase
 {
     /// <summary>
-    /// Retrieves a stock by its identifier.
+    /// Gets detailed information about a specific stock.
     /// </summary>
     /// <param name="stockId">Guid representation of the stock ID.</param>
     /// <returns>The <see cref="StockDto"/> model.</returns>
     [Authorize]
+    /// <summary>
+    /// Retrieves performance data for all stocks in the system.
+    /// </summary>
+    /// <summary>
+    /// Retrieves performance information for all stocks belonging to a specific company.
+    /// </summary>
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StockDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -52,7 +58,7 @@ public class StocksController(
     }
 
     /// <summary>
-    /// Retrieves all available stocks.
+    /// Retrieves a list of every stock currently stored in the system.
     /// </summary>
     /// <returns>List of <see cref="StockDto"/>.</returns>
     [Authorize]
@@ -77,7 +83,7 @@ public class StocksController(
     }
     
     /// <summary>
-    /// Retrieves all available company stocks.
+    /// Retrieves all stocks that belong to a particular company.
     /// </summary>
     /// <returns>List of <see cref="StockDto"/>.</returns>
     [Authorize]
@@ -115,7 +121,7 @@ public class StocksController(
     }
 
     /// <summary>
-    /// Creates a new stock.
+    /// Creates a new stock entry for a company.
     /// </summary>
     /// <param name="model">Stock model.</param>
     /// <returns>Created <see cref="StockDto"/>.</returns>
@@ -145,7 +151,7 @@ public class StocksController(
     }
 
     /// <summary>
-    /// Updates an existing stock.
+    /// Updates an existing stock with new information.
     /// </summary>
     /// <param name="stockId">Stock identifier.</param>
     /// <param name="model">Updated stock model.</param>
@@ -182,7 +188,7 @@ public class StocksController(
     }
 
     /// <summary>
-    /// Deletes a stock by its identifier.
+    /// Deletes a stock with the given identifier.
     /// </summary>
     /// <param name="stockId">Stock identifier.</param>
     /// <returns>Indicates whether deletion succeeded.</returns>
@@ -223,6 +229,11 @@ public class StocksController(
     }
     
     [Produces("application/json")]
+    /// <summary>
+    /// Retrieves performance statistics for a single stock.
+    /// </summary>
+    /// <param name="stockId">Identifier of the stock.</param>
+    /// <returns>Performance metrics for the stock.</returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StockPerformanceDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

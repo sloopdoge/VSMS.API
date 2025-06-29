@@ -8,18 +8,18 @@ namespace VSMS.Infrastructure.Interfaces;
 public interface ITokenService
 {
     /// <summary>
-    /// Generates an authentication token for the specified user and role.
+    /// Generates a JWT token that represents the specified user and role.
     /// </summary>
-    /// <param name="user">The application user.</param>
+    /// <param name="user">The authenticated application user.</param>
     /// <param name="role">Role assigned to the user.</param>
-    /// <param name="rememberMe">Indicates if a long-lived token should be generated.</param>
-    /// <returns>The created <see cref="TokenModel"/>.</returns>
+    /// <param name="rememberMe">When set to <c>true</c>, creates a token with an extended lifetime.</param>
+    /// <returns>The resulting <see cref="TokenModel"/>.</returns>
     TokenModel GenerateToken(ApplicationUser user, ApplicationRole role, bool rememberMe);
 
     /// <summary>
-    /// Validates the provided token and returns its claims principal if valid.
+    /// Validates the provided JWT token and returns the corresponding validation result.
     /// </summary>
-    /// <param name="token">Token to validate.</param>
-    /// <returns>The token's <see cref="ClaimsPrincipal"/> when validation succeeds; otherwise <c>null</c>.</returns>
+    /// <param name="token">Encoded JWT token string.</param>
+    /// <returns>A <see cref="TokenValidationResultModel"/> describing the validation outcome.</returns>
     TokenValidationResultModel ValidateToken(string token);
 }

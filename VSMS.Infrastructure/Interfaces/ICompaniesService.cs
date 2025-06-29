@@ -5,43 +5,45 @@ namespace VSMS.Infrastructure.Interfaces;
 public interface ICompaniesService
 {
     /// <summary>
-    /// Creates a new company using the provided model.
+    /// Creates a new company based on the provided data transfer object and
+    /// returns the resulting company representation.
     /// </summary>
-    /// <param name="model">Data for the company to create.</param>
-    /// <returns>The created <see cref="CompanyDto"/>.</returns>
+    /// <param name="model">Information about the company to be created.</param>
+    /// <returns>The newly created <see cref="CompanyDto"/>.</returns>
     Task<CompanyDto> Create(CompanyDto model);
 
     /// <summary>
-    /// Updates an existing company.
+    /// Applies changes from the specified model to an existing company and
+    /// returns the updated representation.
     /// </summary>
-    /// <param name="model">The company data with updated values.</param>
+    /// <param name="model">The company data with the values to apply.</param>
     /// <returns>The updated <see cref="CompanyDto"/>.</returns>
     Task<CompanyDto> Update(CompanyDto model);
 
     /// <summary>
-    /// Deletes a company by identifier.
+    /// Permanently removes the company identified by the given id.
     /// </summary>
-    /// <param name="id">Company identifier.</param>
-    /// <returns><c>true</c> if the company was deleted; otherwise <c>false</c>.</returns>
+    /// <param name="id">Unique identifier of the company.</param>
+    /// <returns><c>true</c> when the company was removed; otherwise <c>false</c>.</returns>
     Task<bool> DeleteById(Guid id);
 
     /// <summary>
-    /// Retrieves a company by identifier.
+    /// Retrieves company details for the specified identifier.
     /// </summary>
-    /// <param name="id">Company identifier.</param>
-    /// <returns>The <see cref="CompanyDto"/> if found.</returns>
+    /// <param name="id">Unique identifier of the company.</param>
+    /// <returns>The corresponding <see cref="CompanyDto"/> if found.</returns>
     Task<CompanyDto> GetById(Guid id);
 
     /// <summary>
-    /// Retrieves all companies.
+    /// Returns a list of all companies currently stored in the system.
     /// </summary>
-    /// <returns>The list of <see cref="CompanyDto"/> if found.</returns>
+    /// <returns>Collection of <see cref="CompanyDto"/> objects.</returns>
     Task<List<CompanyDto>> GetAll();
 
     /// <summary>
-    /// Checks whether a company title already exists.
+    /// Determines whether a company with the specified title already exists.
     /// </summary>
-    /// <param name="title">Company title to check.</param>
-    /// <returns><c>true</c> if a company with the title exists.</returns>
+    /// <param name="title">Title of the company to check.</param>
+    /// <returns><c>true</c> if a company with the given title is present.</returns>
     Task<bool> IsTitleExists(string title);
 }

@@ -15,7 +15,7 @@ public class UsersController(
     IUserService userService) : ControllerBase
 {
     /// <summary>
-    /// Method to get all User Profiles.
+    /// Retrieves a list of all user profiles in the system.
     /// </summary>
     /// <returns>List with models of User Profiles.</returns>
     [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
@@ -43,7 +43,7 @@ public class UsersController(
     }
     
     /// <summary>
-    /// Method to get User Profile by id.
+    /// Retrieves a specific user profile using its identifier.
     /// </summary>
     /// <param name="userId">Guid representation of User ID.</param>
     /// <returns>Model of User Profile.</returns>
@@ -73,7 +73,7 @@ public class UsersController(
     }
     
     /// <summary>
-    /// Method to create User.
+    /// Creates a new user along with a profile entry.
     /// </summary>
     /// <param name="model">User Create model.</param>
     /// <returns>User Profile of Created User.</returns>
@@ -104,7 +104,7 @@ public class UsersController(
     }
     
     /// <summary>
-    /// Method to update User.
+    /// Updates an existing user's profile information.
     /// </summary>
     /// <param name="userId">User ID.</param>
     /// <param name="model">Updated User Profile model.</param>
@@ -139,7 +139,7 @@ public class UsersController(
     }
     
     /// <summary>
-    /// Method to Delete User by ID.
+    /// Deletes the user identified by the given id.
     /// </summary>
     /// <param name="userId">User ID.</param>
     /// <returns>Indicates whether the deletion succeeded.</returns>
