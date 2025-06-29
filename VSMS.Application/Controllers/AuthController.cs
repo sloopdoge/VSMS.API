@@ -29,43 +29,55 @@ public class AuthController(
     {
         try
         {
+            var loginResult = new LoginResultModel();
+            
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+            {
+                loginResult.Success = false;
+                loginResult.Errors.Add("General", $"Incorrect input data");
+                    
+                return BadRequest(loginResult);
+            }
+            
             var user = await userService.GetUserByEmail(model.Email);
             if (user is null)
-                return NotFound(
-                    new LoginResultModel
-                    {
-                        Success = false,
-                        UserProfile = null,
-                        Token = null,
-                        Errors = [$"User with email: {model.Email} - not found"]
-                    });
+            {
+                loginResult.Success = false;
+                loginResult.Errors.Add(nameof(model.Email), $"User with email: {model.Email} - not found");
+                return NotFound(loginResult);
+            }
+            
+            var userProfile = await userService.GetUserProfileById(user.Id);
+            if (userProfile is null)
+            {
+                loginResult.Success = false;
+                loginResult.Errors.Add(nameof(model.Email), $"User Profile with email: {model.Email} - not found");
+                return NotFound(loginResult);
+            }
 
             var isPasswordCorrect = await userService.IsPasswordCorrect(user, model.Password);
             if (!isPasswordCorrect)
-                return BadRequest(new LoginResultModel
-                {
-                    Success = false,
-                    UserProfile = null,
-                    Token = null,
-                    Errors = ["Password is incorrect"]
-                });
+            {
+                loginResult.Success = false;
+                loginResult.Errors.Add(nameof(model.Email), $"Password is incorrect");
+                return BadRequest(loginResult);
+            }
+
 
             var token = await userService.GenerateToken(user, model.UseLongLivedToken);
             if (string.IsNullOrEmpty(token.Value))
-                return BadRequest(new LoginResultModel
-                {
-                    Success = false,
-                    UserProfile = null,
-                    Token = null,
-                    Errors = ["There was error creating token"]
-                });
-
-            return Ok(new LoginResultModel
             {
-                Success = true,
-                Token = token,
-                UserProfile = await userService.GetUserProfileById(user.Id),
-            });
+                loginResult.Success = false;
+                loginResult.Errors.Add("General", $"There was error creating token");
+                return BadRequest(loginResult);
+            }
+
+            loginResult.Success = true;
+            loginResult.UserProfile = userProfile;
+            loginResult.Token = token;
+            loginResult.Errors.Clear();
+            
+            return Ok(loginResult);
         }
         catch (Exception e)
         {
