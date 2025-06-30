@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
-using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Identity;

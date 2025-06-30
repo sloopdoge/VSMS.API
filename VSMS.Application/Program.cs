@@ -1,5 +1,3 @@
-using FluentValidation;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -75,7 +73,6 @@ public abstract class Program
                 }
             );
             builder.Services.AddControllers();
-            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddDataProtection();

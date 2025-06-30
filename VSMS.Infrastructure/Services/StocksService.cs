@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;

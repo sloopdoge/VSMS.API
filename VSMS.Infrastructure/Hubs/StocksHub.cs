@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using VSMS.Domain;
 using VSMS.Domain.DTOs;
-using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Infrastructure.Hubs;

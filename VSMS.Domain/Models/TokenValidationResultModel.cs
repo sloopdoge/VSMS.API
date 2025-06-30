@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace VSMS.Domain.Models;
+﻿namespace VSMS.Domain.Models;
 
 public class TokenValidationResultModel
 {

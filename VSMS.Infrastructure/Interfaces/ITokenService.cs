@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using VSMS.Domain.Entities;
+﻿using VSMS.Domain.Entities;
 using VSMS.Domain.Models;
 
 namespace VSMS.Infrastructure.Interfaces;
