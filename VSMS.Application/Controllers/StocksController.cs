@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
+using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Identity;
@@ -286,6 +287,30 @@ public class StocksController(
                 return BadRequest("Incorrect input data");
             
             var stocks = await stocksService.GetStocksPerformanceByCompanyId(companyId);
+
+            return Ok(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<StockPerformanceDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("History/{stockId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetStockHistoryById(Guid stockId, [FromBody] StockHistoryFilter filter)
+    {
+        try
+        {
+            if (stockId == Guid.Empty)
+                return BadRequest("Incorrect input data");
+            
+            var stocks = await stocksService.GetHistoryById(stockId, filter.From, filter.To);
 
             return Ok(stocks);
         }
