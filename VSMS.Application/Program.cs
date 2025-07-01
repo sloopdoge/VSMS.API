@@ -60,6 +60,7 @@ public abstract class Program
             builder.AddCompaniesConfiguration();
             builder.AddStocksConfiguration();
             builder.AddApplicationConfiguration();
+            builder.AddSimulationConfiguration();
             
             builder.Services.AddCors(options =>
                 {

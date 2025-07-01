@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
+using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
 
@@ -23,7 +24,7 @@ public class CompaniesService(
             {
                 Id = Guid.NewGuid(),
                 Title = model.Title,
-                NormalizedTitle = model.Title.Normalize(),
+                NormalizedTitle = model.Title.NormalizeText(),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };
@@ -57,7 +58,7 @@ public class CompaniesService(
                 throw new CompanyNotFoundException(model.Id);
 
             existingCompany.Title = model.Title;
-            existingCompany.NormalizedTitle = model.Title.Normalize();
+            existingCompany.NormalizedTitle = model.Title.NormalizeText();
             existingCompany.UpdatedAt = DateTime.UtcNow;
 
             repository.Companies.Update(existingCompany);
@@ -160,7 +161,7 @@ public class CompaniesService(
     {
         try
         {
-            var normalizedTitle = title.Normalize();
+            var normalizedTitle = title.NormalizeText();
             var result = await repository.Companies.Where(c => c.NormalizedTitle == normalizedTitle).FirstOrDefaultAsync();
             
             return result is not null;

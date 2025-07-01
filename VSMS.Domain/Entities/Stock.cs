@@ -1,4 +1,6 @@
-﻿namespace VSMS.Domain.Entities;
+﻿using VSMS.Domain.Enums;
+
+namespace VSMS.Domain.Entities;
 
 public class Stock
 {
@@ -12,4 +14,5 @@ public class Stock
     public DateTime UpdatedAt { get; set; }
     public Guid? CompanyId { get; set; }
     public Company? Company { get; set; }
+    public StockStateEnum State { get; set; }
 }

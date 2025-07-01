@@ -12,7 +12,10 @@ using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Hubs;
 using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
+using VSMS.Infrastructure.Interfaces.Engines;
 using VSMS.Infrastructure.Services;
+using VSMS.Infrastructure.Services.Background;
+using VSMS.Infrastructure.Services.Engines;
 using VSMS.Repository;
 
 namespace VSMS.Infrastructure.Extensions;
@@ -107,6 +110,18 @@ public static class InfrastructureCollectionExtensions
 
         services.AddScoped<ApplicationHub>();
         services.AddScoped<StocksHub>();
+
+        return builder;
+    }
+    
+    public static WebApplicationBuilder AddSimulationConfiguration(this WebApplicationBuilder builder)
+    {
+        var services = builder.Services;
+        var configuration = builder.Configuration;
+        var environment = builder.Environment;
+
+        builder.Services.AddScoped<IStockSimulationEngine, StockSimulationEngine>();
+        builder.Services.AddHostedService<StockSimulationService>();
 
         return builder;
     }

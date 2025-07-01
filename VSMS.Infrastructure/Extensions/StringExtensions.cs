@@ -5,7 +5,7 @@ namespace VSMS.Infrastructure.Extensions;
 
 public static class StringExtensions
 {
-    public static string Normalize(this string input)
+    public static string NormalizeText(this string input)
     {
         if (string.IsNullOrWhiteSpace(input))
             return string.Empty;

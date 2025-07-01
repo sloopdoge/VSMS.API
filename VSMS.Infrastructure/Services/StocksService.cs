@@ -5,6 +5,7 @@ using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
+using VSMS.Infrastructure.Extensions;
 
 namespace VSMS.Infrastructure.Services;
 
@@ -20,9 +21,9 @@ public class StocksService(
             {
                 Id = Guid.NewGuid(),
                 Title = stock.Title,
-                NormalizedTitle = stock.Title.Normalize(),
+                NormalizedTitle = stock.Title.NormalizeText(),
                 Symbol = stock.Symbol,
-                NormalizedSymbol = stock.Symbol.Normalize(),
+                NormalizedSymbol = stock.Symbol.NormalizeText(),
                 Price = stock.Price,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -60,9 +61,9 @@ public class StocksService(
                 throw new StockNotFoundException(stock.Id);
 
             existingStock.Title = stock.Title;
-            existingStock.NormalizedTitle = stock.Title.Normalize();
+            existingStock.NormalizedTitle = stock.Title.NormalizeText();
             existingStock.Symbol = stock.Symbol;
-            existingStock.NormalizedSymbol = stock.Symbol.Normalize();
+            existingStock.NormalizedSymbol = stock.Symbol.NormalizeText();
             existingStock.Price = stock.Price;
             existingStock.UpdatedAt = DateTime.UtcNow;
             existingStock.CompanyId = stock.CompanyId;
@@ -118,7 +119,7 @@ public class StocksService(
     {
         try
         {
-            var normalizedTitle = title.Normalize();
+            var normalizedTitle = title.NormalizeText();
             var stock = await repository.Stocks.FirstOrDefaultAsync(s => s.NormalizedTitle == normalizedTitle);
             if (stock is null)
                 throw new Exception($"Stock with title '{title}' was not found.");
@@ -350,7 +351,7 @@ public class StocksService(
     {
         try
         {
-            var normalizedTitle = title.Normalize();
+            var normalizedTitle = title.NormalizeText();
             var result = await repository.Stocks
                 .Where(c => c.NormalizedTitle == normalizedTitle)
                 .FirstOrDefaultAsync();
