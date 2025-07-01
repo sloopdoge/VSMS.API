@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.Grafana.Loki;
 using VSMS.Application.Swagger;
 using VSMS.Domain.Entities;
@@ -24,25 +25,21 @@ public abstract class Program
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
         }
-
+        
         if (builder.Environment.IsProduction())
         {
             var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
             var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
+            var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .Enrich.WithProperty("app", appName!)
+                .Enrich.WithProperty("service", serviceName!)
                 .WriteTo.GrafanaLoki(
-                    lokiUri,
-                    labels: new[]
-                    {
-                        new LokiLabel
-                        {
-                            Key = "app",
-                            Value = appName
-                        }
-                    },
-                    propertiesAsLabels: new[] { "app" })
+                    lokiUri!,
+                    restrictedToMinimumLevel: LogEventLevel.Information)
                 .CreateLogger();
         }
 
@@ -105,6 +102,7 @@ public abstract class Program
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseHttpsRedirection();
+            app.UseSerilogRequestLogging();
 
             app.UseForwardedHeaders(new()
             {
