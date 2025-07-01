@@ -39,6 +39,11 @@ public class ApplicationRepository(DbContextOptions<ApplicationRepository> optio
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
         
+        modelBuilder.Entity<Stock>(entity =>
+        {
+            entity.Property(s => s.Price).HasPrecision(18, 6);
+        });
+        
         modelBuilder.Entity<Stock>()
             .ToTable(
                 "Stocks",
