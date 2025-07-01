@@ -19,15 +19,15 @@ public abstract class Program
 
         #region Serilog Logger
 
-        if (builder.Environment.IsDevelopment())
-        {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .CreateLogger();
-        }
-        
-        if (builder.Environment.IsProduction())
-        {
+        // if (builder.Environment.IsDevelopment())
+        // {
+        //     Log.Logger = new LoggerConfiguration()
+        //         .ReadFrom.Configuration(builder.Configuration)
+        //         .CreateLogger();
+        // }
+        //
+        // if (builder.Environment.IsProduction())
+        // {
             var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
             var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
             var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
@@ -35,13 +35,24 @@ public abstract class Program
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("app", appName!)
-                .Enrich.WithProperty("service", serviceName!)
                 .WriteTo.GrafanaLoki(
                     lokiUri!,
+                    labels:
+                    [
+                        new LokiLabel
+                        {
+                            Key = "app",
+                            Value = appName!
+                        },
+                        new LokiLabel
+                        {
+                            Key = "service",
+                            Value = serviceName!
+                        }
+                    ],
                     restrictedToMinimumLevel: LogEventLevel.Information)
                 .CreateLogger();
-        }
+        // }
 
         builder.Logging.ClearProviders();
         builder.Host.UseSerilog();
