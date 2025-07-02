@@ -19,40 +19,40 @@ public abstract class Program
 
         #region Serilog Logger
 
-        if (builder.Environment.IsDevelopment())
-        {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .CreateLogger();
-        }
-        
-        if (builder.Environment.IsProduction())
-        {
-            var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
-            var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
-            var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
+        // #if DEBUG
+        //
+        // Log.Logger = new LoggerConfiguration()
+        //     .ReadFrom.Configuration(builder.Configuration)
+        //     .CreateLogger();
+        //
+        // #else
+        //
+        var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
+        var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
+        var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
 
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .Enrich.FromLogContext()
-                .WriteTo.GrafanaLoki(
-                    lokiUri!,
-                    labels:
-                    [
-                        new LokiLabel
-                        {
-                            Key = "app",
-                            Value = appName!
-                        },
-                        new LokiLabel
-                        {
-                            Key = "service",
-                            Value = serviceName!
-                        }
-                    ],
-                    restrictedToMinimumLevel: LogEventLevel.Information)
-                .CreateLogger();
-        }
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.FromLogContext()
+            .WriteTo.GrafanaLoki(
+                lokiUri!,
+                labels:
+                [
+                    new LokiLabel
+                    {
+                        Key = "app",
+                        Value = appName!
+                    },
+                    new LokiLabel
+                    {
+                        Key = "service",
+                        Value = serviceName!
+                    }
+                ],
+                restrictedToMinimumLevel: LogEventLevel.Information)
+            .CreateLogger();
+        
+        // #endif
 
         builder.Logging.ClearProviders();
         builder.Host.UseSerilog();
@@ -92,15 +92,18 @@ public abstract class Program
             
             var app = builder.Build();
             
-            using (var scope = app.Services.CreateScope())
+            if (builder.Configuration.GetValue<bool>("NeedToReinitializeUsersAndRoles"))
             {
-                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-                await RoleInitializer.Initialize(roleManager, logger);
-                
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                await UserInitializer.Initialize(userManager, logger);
+                using (var scope = app.Services.CreateScope())
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+                    await RoleInitializer.Initialize(roleManager, logger);
+                    
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                    await UserInitializer.Initialize(userManager, logger);
+                }
             }
 
             app.UseStaticFiles();
