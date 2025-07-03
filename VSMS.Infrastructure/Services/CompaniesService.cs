@@ -142,12 +142,10 @@ public class CompaniesService(
                 UpdatedAt = c.UpdatedAt,
             }).ToList();
 
-            var tasks = result.Select(async company =>
+            foreach (var company in result)
             {
                 company.UserProfiles = await companyUsersService.GetAllUsersInCompany(company.Id);
-            }).ToList();
-
-            await Task.WhenAll(tasks);
+            }
 
             return result;
         }

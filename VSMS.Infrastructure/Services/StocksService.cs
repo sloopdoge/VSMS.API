@@ -253,6 +253,7 @@ public class StocksService(
                     .TemporalAll()
                     .Where(s => s.Id == currentStock.Id)
                     .OrderByDescending(s => EF.Property<DateTime>(s, "PeriodEnd"))
+                    .Skip(1)
                     .FirstOrDefaultAsync();
                 
                 stocksPerformance.Add(new StockPerformanceDto
