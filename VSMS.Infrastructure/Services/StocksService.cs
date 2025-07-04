@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
+using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
-using VSMS.Infrastructure.Extensions;
 
 namespace VSMS.Infrastructure.Services;
 

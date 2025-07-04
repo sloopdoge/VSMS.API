@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
-using VSMS.Domain.Models;
 using VSMS.Domain.Exceptions;
+using VSMS.Domain.Models;
 using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Infrastructure.Services;

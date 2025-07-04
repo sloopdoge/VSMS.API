@@ -145,7 +145,7 @@ public class UsersController(
     /// <returns>Indicates whether the deletion succeeded.</returns>
     [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDto))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

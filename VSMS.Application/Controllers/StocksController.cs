@@ -4,8 +4,8 @@ using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
-using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Identity;
+using VSMS.Infrastructure.Interfaces;
 
 namespace VSMS.Application.Controllers;
 
