@@ -13,9 +13,11 @@ using VSMS.Infrastructure.Hubs;
 using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Infrastructure.Interfaces.Engines;
+using VSMS.Infrastructure.Interfaces.SenderHubs;
 using VSMS.Infrastructure.Services;
 using VSMS.Infrastructure.Services.Background;
 using VSMS.Infrastructure.Services.Engines;
+using VSMS.Infrastructure.Services.SenderHubs;
 using VSMS.Repository;
 
 namespace VSMS.Infrastructure.Extensions;
@@ -86,6 +88,7 @@ public static class InfrastructureCollectionExtensions
         var environment = builder.Environment;
 
         services.AddScoped<IStocksService, StocksService>();
+        services.AddScoped<IStocksSenderHub, StocksSenderHub>();
 
         return builder;
     }

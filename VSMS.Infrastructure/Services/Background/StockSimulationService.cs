@@ -2,6 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using VSMS.Domain.DTOs;
+using VSMS.Infrastructure.Hubs;
+using VSMS.Infrastructure.Interfaces.SenderHubs;
 using VSMS.Infrastructure.Services.Engines;
 using VSMS.Repository;
 
@@ -22,7 +25,8 @@ public class StockSimulationService(
             {
                 using var scope = scopeFactory.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationRepository>();
-                 var stocks = await db.Stocks.ToListAsync(stoppingToken);
+                var stocksSenderHub = scope.ServiceProvider.GetRequiredService<IStocksSenderHub>();
+                var stocks = await db.Stocks.ToListAsync(stoppingToken);
 
                 foreach (var stock in stocks)
                 {
@@ -30,8 +34,21 @@ public class StockSimulationService(
                     engine.UpdateStockPrice(stock);
                 }
 
-                await db.SaveChangesAsync(stoppingToken);
-                logger.LogInformation("Updated {Count} stocks at {Time}", stocks.Count, DateTime.UtcNow);
+                var res = await db.SaveChangesAsync(stoppingToken);
+                if (res > 1 && stocks.Any())
+                {
+                    logger.LogInformation("Updated {Count} stocks at {Time}", stocks.Count, DateTime.UtcNow);
+                    _ = stocksSenderHub.OnStocksPriceChanged(stocks.Select(s => new StockDto
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        Symbol = s.Symbol,
+                        Price = s.Price,
+                        CreatedAt = s.CreatedAt,
+                        UpdatedAt = s.UpdatedAt,
+                        CompanyId = s.CompanyId
+                    }).ToList());
+                }
             }
             catch (Exception ex)
             {
