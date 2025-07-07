@@ -28,7 +28,7 @@ public static class UserInitializer
                 
                 var adminUserCreateResult = await userManager.CreateAsync(adminUser, AdminPassword);
                 if (!adminUserCreateResult.Succeeded)
-                    throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors));
+                    throw new Exception(string.Join(Environment.NewLine, adminUserCreateResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
                 
                 logger.LogInformation("Admin user created");
             }
@@ -37,7 +37,7 @@ public static class UserInitializer
             {
                 var adminUserAddAdminRoleResult = await userManager.AddToRoleAsync(adminUser, RoleNames.Admin);
                 if (!adminUserAddAdminRoleResult.Succeeded)
-                    throw new Exception(string.Join(Environment.NewLine, adminUserAddAdminRoleResult.Errors));
+                    throw new Exception(string.Join(Environment.NewLine, adminUserAddAdminRoleResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
                 
                 logger.LogInformation($"{nameof(UserInitializer)}: Added role to Admin user");
             }

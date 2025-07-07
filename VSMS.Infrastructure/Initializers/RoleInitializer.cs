@@ -18,7 +18,7 @@ public static class RoleInitializer
                 var result = await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
 
                 if (!result.Succeeded) 
-                    throw new Exception(string.Join(Environment.NewLine, result.Errors));
+                    throw new Exception(string.Join(Environment.NewLine, result.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
                 logger.LogInformation($"{nameof(RoleInitializer)}: Role {roleName} created");
             }

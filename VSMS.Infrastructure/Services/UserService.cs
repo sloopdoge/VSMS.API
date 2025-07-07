@@ -67,7 +67,7 @@ public class UserService(
             }, model.Password);
 
             if (!userCreateResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, userCreateResult.Errors));
+                throw new Exception(string.Join(Environment.NewLine, userCreateResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
             var createdUser = await GetUserByEmail(model.Email);
             if (createdUser is null)
@@ -189,7 +189,7 @@ public class UserService(
                 Email = model.Email,
             });
             if (!createRes.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, createRes.Errors));
+                throw new Exception(string.Join(Environment.NewLine, createRes.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
             var createdUser = await userManager.FindByEmailAsync(model.Email);
             if (createdUser is null)
@@ -197,7 +197,7 @@ public class UserService(
             
             var roleAssignResult = await userManager.AddToRoleAsync(createdUser, model.RoleName);
             if (!roleAssignResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, roleAssignResult.Errors));
+                throw new Exception(string.Join(Environment.NewLine, roleAssignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
             var userRole = (await userManager.GetRolesAsync(createdUser)).FirstOrDefault();
 
@@ -234,7 +234,7 @@ public class UserService(
 
             var updateResult = await userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, updateResult.Errors));
+                throw new Exception(string.Join(Environment.NewLine, updateResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
 
             var existingRoles = await userManager.GetRolesAsync(user);
             var currentRole = existingRoles.FirstOrDefault();
@@ -245,12 +245,12 @@ public class UserService(
                 {
                     var removeResult = await userManager.RemoveFromRoleAsync(user, currentRole);
                     if (!removeResult.Succeeded)
-                        throw new Exception(string.Join(Environment.NewLine, removeResult.Errors));
+                        throw new Exception(string.Join(Environment.NewLine, removeResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
                 }
 
                 var assignResult = await userManager.AddToRoleAsync(user, updatingUser.Role);
                 if (!assignResult.Succeeded)
-                    throw new Exception(string.Join(Environment.NewLine, assignResult.Errors));
+                    throw new Exception(string.Join(Environment.NewLine, assignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             }
 
             return new UserProfileDto
@@ -280,7 +280,7 @@ public class UserService(
 
             var deleteResult = await userManager.DeleteAsync(user);
             if (!deleteResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, deleteResult.Errors));
+                throw new Exception(string.Join(Environment.NewLine, deleteResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
 
             return true;
         }

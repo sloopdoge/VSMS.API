@@ -29,7 +29,7 @@ public class CompanyUsersService(
             user.CompanyId = companyId;
             var result = await userManager.UpdateAsync(user);
             if (!result.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, result.Errors));
+                throw new Exception(string.Join(Environment.NewLine, result.Errors.Select(e => $"{e.Code}: {e.Description}")));
 
             return true;
         }
@@ -57,7 +57,7 @@ public class CompanyUsersService(
             user.CompanyId = Guid.Empty;
             var result = await userManager.UpdateAsync(user);
             if (!result.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, result.Errors));
+                throw new Exception(string.Join(Environment.NewLine, result.Errors.Select(e => $"{e.Code}: {e.Description}")));
 
             return true;
         }
