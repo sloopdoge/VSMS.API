@@ -19,40 +19,40 @@ public abstract class Program
 
         #region Serilog Logger
 
-        #if DEBUG
-        
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
-            .CreateLogger();
-        
-        #else
-        
-        var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
-        var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
-        var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
+        if (builder.Environment.IsDevelopment())
+        {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .CreateLogger();
+        }
 
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
-            .Enrich.FromLogContext()
-            .WriteTo.GrafanaLoki(
-                lokiUri!,
-                labels:
-                [
-                    new LokiLabel
-                    {
-                        Key = "app",
-                        Value = appName!
-                    },
-                    new LokiLabel
-                    {
-                        Key = "service",
-                        Value = serviceName!
-                    }
-                ],
-                restrictedToMinimumLevel: LogEventLevel.Information)
-            .CreateLogger();
-        
-        #endif
+        if (builder.Environment.IsProduction())
+        {
+            var lokiUri = builder.Configuration.GetValue<string>("LokiSettings:Url");
+            var appName = builder.Configuration.GetValue<string>("LokiSettings:AppName");
+            var serviceName = builder.Configuration.GetValue<string>("LokiSettings:ServiceName");
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .WriteTo.GrafanaLoki(
+                    lokiUri!,
+                    labels:
+                    [
+                        new LokiLabel
+                        {
+                            Key = "app",
+                            Value = appName!
+                        },
+                        new LokiLabel
+                        {
+                            Key = "service",
+                            Value = serviceName!
+                        }
+                    ],
+                    restrictedToMinimumLevel: LogEventLevel.Information)
+                .CreateLogger();
+        }
 
         builder.Logging.ClearProviders();
         builder.Host.UseSerilog();
