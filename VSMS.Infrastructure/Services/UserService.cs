@@ -210,7 +210,7 @@ public class UserService(
             {
                 Recipient = [createdUser.Email],
                 Subject = $"User successfully created",
-                Body = $"Hello, {createdUser.FirstName} {createdUser.LastName}!\nYour username: {createdUser.Email}\nYour password: {generatedPassword}\n"
+                Body = $"Hello!\nYour username: {createdUser.Email}\nYour password: {generatedPassword}\n"
             });
             if (!isEmailSent)
                 logger.LogWarning($"Failed to send creation email.");
