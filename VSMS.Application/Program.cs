@@ -1,9 +1,11 @@
+using MessageService.Infrastructure.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Grafana.Loki;
 using VSMS.Application.Swagger;
+using VSMS.Common.Settings;
 using VSMS.Domain.Entities;
 using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Hubs;
@@ -62,6 +64,9 @@ public abstract class Program
         Log.Warning("Starting web host");
         try
         {
+            builder.Services.AddSingleton<IIntegrationSettings, IntegrationSettings>( sp => 
+                builder.Configuration.GetSection("IntegrationSettings").Get<IntegrationSettings>()!);
+            
             builder.AddSwaggerConfiguration();
             
             builder.AddIdentityConfiguration();
@@ -69,6 +74,8 @@ public abstract class Program
             builder.AddStocksConfiguration();
             builder.AddApplicationConfiguration();
             builder.AddSimulationConfiguration();
+
+            builder.AddMessageServiceIntegration();
             
             builder.Services.AddCors(options =>
                 {

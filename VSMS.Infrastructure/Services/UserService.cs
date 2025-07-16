@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MessageService.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
@@ -6,6 +7,7 @@ using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Domain.Models;
 using VSMS.Infrastructure.Interfaces;
+using VSMS.Utilities.Helpers;
 
 namespace VSMS.Infrastructure.Services;
 
@@ -13,7 +15,8 @@ public class UserService(
     ILogger<UserService> logger, 
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
-    ITokenService tokenService) : IUserService
+    ITokenService tokenService,
+    IMessageServiceClient messageServiceClient) : IUserService
 {
     #region Identity
     
@@ -183,11 +186,13 @@ public class UserService(
     {
         try
         {
+            var generatedPassword = PasswordHelper.GeneratePassword();
+            
             var createRes = await userManager.CreateAsync(new ApplicationUser
             {
                 UserName = model.Username,
                 Email = model.Email,
-            });
+            }, generatedPassword);
             if (!createRes.Succeeded)
                 throw new Exception(string.Join(Environment.NewLine, createRes.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
@@ -201,6 +206,15 @@ public class UserService(
             
             var userRole = (await userManager.GetRolesAsync(createdUser)).FirstOrDefault();
 
+            var isEmailSent = await messageServiceClient.SendMessage(new()
+            {
+                Recipient = [createdUser.Email],
+                Subject = $"User successfully created",
+                Body = $"Hello, {createdUser.FirstName} {createdUser.LastName}!\nYour username: {createdUser.Email}\nYour password: {generatedPassword}\n"
+            });
+            if (!isEmailSent)
+                logger.LogWarning($"Failed to send creation email.");
+            
             return new UserProfileDto
             {
                 Id = createdUser.Id,

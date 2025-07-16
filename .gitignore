@@ -1,47 +1,25 @@
 .idea/
+/VSMS.API.sln.DotSettings.user
+/VSMS.Common/obj/
+/VSMS.Common/bin/
+/VSMS.Utilities/obj/
+/VSMS.Utilities/bin/
 appsettings.Development.json
 appsettings.Production.json
 
 # Main API project
 VSMS.Application/obj/
 VSMS.Application/bin/
+VSMS.Application/appsettings.Development.json
 VSMS.Domain/obj/
 VSMS.Domain/bin/
 VSMS.Repository/obj/
 VSMS.Repository/bin/
 VSMS.Infrastructure/obj/
 VSMS.Infrastructure/bin/
-VSMS.Application/appsettings.Development.json
 
-# Identity service
-VSMS.Identity.Application/obj/
-VSMS.Identity.Application/bin/
-VSMS.Identity.Domain/obj/
-VSMS.Identity.Domain/bin/
-VSMS.Identity.Repository/obj/
-VSMS.Identity.Repository/bin/
-VSMS.Identity.Infrastructure/obj/
-VSMS.Identity.Infrastructure/bin/
-VSMS.Identity.Application/appsettings.Development.json
-
-# Stock service
-VSMS.Stock.Application/obj/
-VSMS.Stock.Application/bin/
-VSMS.Stock.Domain/obj/
-VSMS.Stock.Domain/bin/
-VSMS.Stock.Repository/obj/
-VSMS.Stock.Repository/bin/
-VSMS.Stock.Infrastructure/obj/
-VSMS.Stock.Infrastructure/bin/
-VSMS.Stock.Application/appsettings.Development.json
-
-# Stock service
-VSMS.Company.Application/obj/
-VSMS.Company.Application/bin/
-VSMS.Company.Domain/obj/
-VSMS.Company.Domain/bin/
-VSMS.Company.Repository/obj/
-VSMS.Company.Repository/bin/
-VSMS.Company.Infrastructure/obj/
-VSMS.Company.Infrastructure/bin/
-VSMS.Company.Application/appsettings.Development.json
+# Message Service integration
+/MessageService.Infrastructure/obj/
+/MessageService.Infrastructure/bin/
+/MessageService.Domain/obj/
+/MessageService.Domain/bin/

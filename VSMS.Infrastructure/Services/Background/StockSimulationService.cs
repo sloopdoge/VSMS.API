@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
-using VSMS.Infrastructure.Hubs;
 using VSMS.Infrastructure.Interfaces.SenderHubs;
 using VSMS.Infrastructure.Services.Engines;
 using VSMS.Repository;
