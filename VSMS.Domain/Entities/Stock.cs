@@ -10,6 +10,7 @@ public class Stock
     public string Symbol { get; set; }
     public string NormalizedSymbol { get; set; }
     public decimal Price { get; set; }
+    public decimal InitialPrice { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public Guid? CompanyId { get; set; }

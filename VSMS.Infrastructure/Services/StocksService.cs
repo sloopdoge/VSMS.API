@@ -25,6 +25,7 @@ public class StocksService(
                 Symbol = stock.Symbol,
                 NormalizedSymbol = stock.Symbol.NormalizeText(),
                 Price = stock.Price,
+                InitialPrice = stock.Price,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 CompanyId = stock.CompanyId
@@ -65,6 +66,7 @@ public class StocksService(
             existingStock.Symbol = stock.Symbol;
             existingStock.NormalizedSymbol = stock.Symbol.NormalizeText();
             existingStock.Price = stock.Price;
+            existingStock.InitialPrice = stock.Price;
             existingStock.UpdatedAt = DateTime.UtcNow;
             existingStock.CompanyId = stock.CompanyId;
 
