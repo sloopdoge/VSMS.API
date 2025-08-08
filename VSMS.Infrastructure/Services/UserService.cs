@@ -291,6 +291,10 @@ public class UserService(
             var user = await userManager.FindByIdAsync(userId.ToString());
             if (user is null)
                 throw new UserNotFoundException(userId);
+            
+            var userRoles = await userManager.GetRolesAsync(user);
+            if (userRoles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
+                return false;
 
             var deleteResult = await userManager.DeleteAsync(user);
             if (!deleteResult.Succeeded)
