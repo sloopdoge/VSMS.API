@@ -135,13 +135,17 @@ public class UserService(
         }
     }
     
-    public async Task<ApplicationUser?> GetUserById(Guid id)
+    public async Task<ApplicationUser?> GetUserById(Guid userId)
     {
         try
         {
-            var user = await userManager.FindByIdAsync(id.ToString());
+            var user = await userManager.FindByIdAsync(userId.ToString());
             if (user is null)
-                throw new UserNotFoundException(id);
+                throw new UserNotFoundException(userId);
+            
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
+                throw new UserNotFoundException(userId);
 
             return user;
         }
@@ -164,6 +168,8 @@ public class UserService(
                 throw new UserNotFoundException(userId);
 
             var roles = await userManager.GetRolesAsync(user);
+            if (roles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
+                throw new UserNotFoundException(userId);
 
             return new UserProfileDto
             {
@@ -319,6 +325,9 @@ public class UserService(
             foreach (var user in users)
             {
                 var roles = await userManager.GetRolesAsync(user);
+                if (roles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+                
                 profiles.Add(new UserProfileDto
                 {
                     Id = user.Id,

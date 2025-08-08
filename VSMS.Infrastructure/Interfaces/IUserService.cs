@@ -51,9 +51,9 @@ public interface IUserService
     /// <summary>
     /// Finds a user entity by its unique identifier.
     /// </summary>
-    /// <param name="id">User identifier.</param>
+    /// <param name="userId">User identifier.</param>
     /// <returns>The <see cref="ApplicationUser"/> if found; otherwise <c>null</c>.</returns>
-    Task<ApplicationUser?> GetUserById(Guid id);
+    Task<ApplicationUser?> GetUserById(Guid userId);
     
     #endregion
 
