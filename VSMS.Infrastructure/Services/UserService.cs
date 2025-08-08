@@ -142,10 +142,6 @@ public class UserService(
             var user = await userManager.FindByIdAsync(userId.ToString());
             if (user is null)
                 throw new UserNotFoundException(userId);
-            
-            var roles = await userManager.GetRolesAsync(user);
-            if (roles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
-                throw new UserNotFoundException(userId);
 
             return user;
         }
@@ -168,8 +164,6 @@ public class UserService(
                 throw new UserNotFoundException(userId);
 
             var roles = await userManager.GetRolesAsync(user);
-            if (roles.Any(r => string.Equals(r, RoleNames.Admin, StringComparison.OrdinalIgnoreCase)))
-                throw new UserNotFoundException(userId);
 
             return new UserProfileDto
             {
