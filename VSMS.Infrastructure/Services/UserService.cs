@@ -1,4 +1,5 @@
-﻿using MessageService.Infrastructure.Interfaces;
+﻿using MessageService.Domain.Enums;
+using MessageService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.Constants;
@@ -210,7 +211,9 @@ public class UserService(
             {
                 Recipient = [createdUser.Email],
                 Subject = $"User successfully created",
-                Body = $"Hello!\nYour username: {createdUser.Email}\nYour password: {generatedPassword}\n"
+                Body = $"Hello!\nYour username: {createdUser.Email}\nYour password: {generatedPassword}\n",
+                SenderType = SenderType.Email,
+                Type = MessageType.Instant,
             });
             if (!isEmailSent)
                 logger.LogWarning($"Failed to send creation email.");

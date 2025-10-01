@@ -8,12 +8,12 @@ namespace MessageService.Domain.Models;
 public class SendMessageModel
 {
     /// <summary>
-    /// Gets or sets the list of recipient email addresses.
+    /// Gets or sets the list of recipient addresses (e.g., email, phone, or username depending on sender type).
     /// </summary>
     public List<string> Recipient { get; set; }
 
     /// <summary>
-    /// Gets or sets the subject of the message.
+    /// Gets or sets the subject of the message (mainly used for email).
     /// </summary>
     public string? Subject { get; set; }
 
@@ -23,7 +23,17 @@ public class SendMessageModel
     public string Body { get; set; }
 
     /// <summary>
-    /// Gets or sets the type of the message (e.g., Email, SMS).
+    /// Gets or sets the type of the message (instant or delayed).
     /// </summary>
     public MessageType Type { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the scheduled date and time for sending the message (only used when delayed).
+    /// </summary>
+    public DateTime? SendAt { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the channel through which the message will be sent (Email, SMS, Telegram).
+    /// </summary>
+    public SenderType SenderType { get; set; }
 }

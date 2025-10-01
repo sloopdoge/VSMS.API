@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
 using VSMS.Infrastructure.Interfaces;
+using static VSMS.Domain.Constants.PolicyNames;
 
 namespace VSMS.Application.Controllers;
 
@@ -18,7 +18,7 @@ public class UsersController(
     /// Retrieves a list of all user profiles in the system.
     /// </summary>
     /// <returns>List with models of User Profiles.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
+    [Authorize(Policy = AdminOrCompanyAdminOrManager)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserProfileDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -47,7 +47,7 @@ public class UsersController(
     /// </summary>
     /// <param name="userId">Guid representation of User ID.</param>
     /// <returns>Model of User Profile.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
+    [Authorize(Policy = AdminOrCompanyAdminOrManager)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -77,7 +77,7 @@ public class UsersController(
     /// </summary>
     /// <param name="model">User Create model.</param>
     /// <returns>User Profile of Created User.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
+    [Authorize(Policy = AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -109,7 +109,7 @@ public class UsersController(
     /// <param name="userId">User ID.</param>
     /// <param name="model">Updated User Profile model.</param>
     /// <returns>Updated User Profile.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdminOrManager)]
+    [Authorize(Policy = AdminOrCompanyAdminOrManager)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserProfileDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,7 +143,7 @@ public class UsersController(
     /// </summary>
     /// <param name="userId">User ID.</param>
     /// <returns>Indicates whether the deletion succeeded.</returns>
-    [Authorize(Policy = PolicyNames.AdminOrCompanyAdmin)]
+    [Authorize(Policy = AdminOrCompanyAdmin)]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

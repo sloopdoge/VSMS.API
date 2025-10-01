@@ -3,6 +3,7 @@ using MessageService.Domain.Models;
 using MessageService.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
 using VSMS.Common.Settings;
+using static MessageService.Domain.Constants.MessageServiceUriEndpoints;
 
 namespace MessageService.Infrastructure.Services;
 
@@ -10,6 +11,8 @@ public class MessageServiceClient : IMessageServiceClient
 {
     private readonly ILogger<MessageServiceClient> _logger;
     private readonly HttpClient _httpClient;
+
+    private const string ApiUri = "api/Message";
 
     public MessageServiceClient(
         ILogger<MessageServiceClient> logger,
@@ -30,7 +33,7 @@ public class MessageServiceClient : IMessageServiceClient
     {
         try
         {
-            var result = await _httpClient.PostAsJsonAsync("api/Messages/Send", messageModel);
+            var result = await _httpClient.PostAsJsonAsync(FormUri(Send), messageModel);
             return result.IsSuccessStatusCode;
         }
         catch (Exception e)
@@ -38,5 +41,10 @@ public class MessageServiceClient : IMessageServiceClient
             _logger.LogError(e, e.Message);
             return false;
         }
+    }
+
+    private static string FormUri(string endpoint)
+    {
+        return $"{ApiUri}/{endpoint}";
     }
 }
