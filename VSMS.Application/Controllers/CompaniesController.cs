@@ -17,7 +17,6 @@ public class CompaniesController(
     ICompanyUsersService companyUsersService,
     IAuthorizationService authorizationService) : ControllerBase
 {
-
     /// <summary>
     /// Retrieves details of a specific company using its identifier.
     /// </summary>
