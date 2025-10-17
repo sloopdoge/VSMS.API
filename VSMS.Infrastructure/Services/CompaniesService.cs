@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
+using VSMS.Domain.Extensions;
+using VSMS.Domain.Models;
+using VSMS.Domain.Models.Filters;
 using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Interfaces;
 using VSMS.Repository;
@@ -44,6 +47,7 @@ public class CompaniesService(
         }
         catch (Exception e)
         {
+            logger.LogError(e, e.Message);
             throw new Exception(e.Message, e);
         }
     }
@@ -77,6 +81,7 @@ public class CompaniesService(
         }
         catch (Exception e)
         {
+            logger.LogError(e, e.Message);
             throw new Exception(e.Message, e);
         }
     }
@@ -123,6 +128,7 @@ public class CompaniesService(
         }
         catch (Exception e)
         {
+            logger.LogError(e, e.Message);
             throw new Exception(e.Message, e);
         }
     }
@@ -151,6 +157,70 @@ public class CompaniesService(
         }
         catch (Exception e)
         {
+            logger.LogError(e, e.Message);
+            throw new Exception(e.Message, e);
+        }
+    }
+    
+    public async Task<PagedResultModel<CompanyDto>> GetByFilter(CompaniesFilterModel filterModel)
+    {
+        try
+        {
+            var query = repository.Companies
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterModel.Search))
+                query = query.Where(c => c.Title.Contains(filterModel.Search));
+
+            if (filterModel.CreatedFrom.HasValue)
+                query = query.Where(c => c.CreatedAt >= filterModel.CreatedFrom.Value);
+
+            if (filterModel.CreatedTo.HasValue)
+                query = query.Where(c => c.CreatedAt <= filterModel.CreatedTo.Value);
+
+            var totalCount = await query.CountAsync();
+
+            if (!string.IsNullOrEmpty(filterModel.SortBy))
+            {
+                query = filterModel.SortAscending
+                    ? query.OrderByDynamic(filterModel.SortBy)
+                    : query.OrderByDescendingDynamic(filterModel.SortBy);
+            }
+            else
+            {
+                query = query.OrderByDescending(c => c.CreatedAt);
+            }
+
+            var companies = await query
+                .Skip((filterModel.Page - 1) * filterModel.PageSize)
+                .Take(filterModel.PageSize)
+                .ToListAsync();
+
+            var resultItems = new List<CompanyDto>();
+            foreach (var c in companies)
+            {
+                var dto = new CompanyDto
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt,
+                    UserProfiles = await companyUsersService.GetAllUsersInCompany(c.Id)
+                };
+                resultItems.Add(dto);
+            }
+
+            return new PagedResultModel<CompanyDto>
+            {
+                Items = resultItems,
+                TotalCount = totalCount,
+                Page = filterModel.Page,
+                PageSize = filterModel.PageSize
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
             throw new Exception(e.Message, e);
         }
     }
@@ -166,6 +236,7 @@ public class CompaniesService(
         }
         catch (Exception e)
         {
+            logger.LogError(e, e.Message);
             throw new Exception(e.Message, e);
         }
     }

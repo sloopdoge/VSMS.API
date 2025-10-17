@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Exceptions;
+using VSMS.Domain.Models;
+using VSMS.Domain.Models.Filters;
 using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 
@@ -64,6 +66,35 @@ public class CompaniesController(
         {
             var company = await companiesService.GetAll();
             return Ok(company);
+        }
+        catch (CompanyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    /// <summary>
+    /// Returns a list of filtered companies stored in the system.
+    /// </summary>
+    /// <returns>Collection of <see cref="CompanyDto"/> items.</returns>
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultModel<CompanyDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPost("ByFilter")]
+    public async Task<IActionResult> GetCompaniesByFilter([FromBody] CompaniesFilterModel filterModel)
+    {
+        try
+        {
+            var result = await companiesService.GetByFilter(filterModel);
+            return Ok(result);
         }
         catch (CompanyNotFoundException)
         {

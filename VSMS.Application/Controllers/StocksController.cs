@@ -4,6 +4,8 @@ using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
+using VSMS.Domain.Models;
+using VSMS.Domain.Models.Filters;
 using VSMS.Infrastructure.Identity;
 using VSMS.Infrastructure.Interfaces;
 
@@ -68,6 +70,27 @@ public class StocksController(
         {
             var stocks = await stocksService.GetAll();
             return Ok(stocks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return StatusCode(500, e.Message);
+        }
+    }
+    
+    [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResultModel<StockDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpGet("ByFilter")]
+    public async Task<IActionResult> GetStocksByFilter([FromBody] StocksFilterModel filter)
+    {
+        try
+        {
+            var result = await stocksService.GetByFilter(filter);
+            return Ok(result);
         }
         catch (Exception e)
         {

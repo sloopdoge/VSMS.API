@@ -1,4 +1,6 @@
 ﻿using VSMS.Domain.DTOs;
+using VSMS.Domain.Models;
+using VSMS.Domain.Models.Filters;
 
 namespace VSMS.Infrastructure.Interfaces;
 
@@ -38,6 +40,8 @@ public interface IStocksService
     /// </summary>
     /// <returns>List of <see cref="StockDto"/> objects.</returns>
     Task<List<StockDto>> GetAll();
+
+    Task<PagedResultModel<StockDto>> GetByFilter(StocksFilterModel filter);
 
     /// <summary>
     /// Removes the stock identified by the given id.

@@ -1,4 +1,6 @@
 ﻿using VSMS.Domain.DTOs;
+using VSMS.Domain.Models;
+using VSMS.Domain.Models.Filters;
 
 namespace VSMS.Infrastructure.Interfaces;
 
@@ -41,9 +43,16 @@ public interface ICompaniesService
     Task<List<CompanyDto>> GetAll();
 
     /// <summary>
+    /// Returns a list of filtered companies stored in the system.
+    /// </summary>
+    /// <returns>Collection of <see cref="CompanyDto"/> items.</returns>
+    Task<PagedResultModel<CompanyDto>> GetByFilter(CompaniesFilterModel filterModel);
+    
+    /// <summary>
     /// Determines whether a company with the specified title already exists.
     /// </summary>
     /// <param name="title">Title of the company to check.</param>
     /// <returns><c>true</c> if a company with the given title is present.</returns>
     Task<bool> IsTitleExists(string title);
+
 }
