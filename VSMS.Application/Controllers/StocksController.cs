@@ -84,7 +84,7 @@ public class StocksController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("ByFilter")]
+    [HttpPost("ByFilter")]
     public async Task<IActionResult> GetStocksByFilter([FromBody] StocksFilterModel filter)
     {
         try

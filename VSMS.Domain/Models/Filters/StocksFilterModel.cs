@@ -3,9 +3,14 @@
 public class StocksFilterModel : BaseFilterModel
 {
     /// <summary>
-    /// Optional filter by related company identifier.
+    /// Optional filter by multiple company identifiers.
     /// </summary>
-    public Guid? CompanyId { get; set; }
+    public List<Guid>? CompanyIds { get; set; }
+
+    /// <summary>
+    /// Optional filter by multiple stock symbols (case-insensitive).
+    /// </summary>
+    public List<string>? Symbols { get; set; }
 
     /// <summary>
     /// Optional lower bound for stock price.
@@ -21,9 +26,4 @@ public class StocksFilterModel : BaseFilterModel
     /// Optional filter by stock title (partial match).
     /// </summary>
     public string? Title { get; set; }
-
-    /// <summary>
-    /// Optional filter by stock symbol (partial match).
-    /// </summary>
-    public string? Symbol { get; set; }
 }

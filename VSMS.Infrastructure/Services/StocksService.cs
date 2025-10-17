@@ -170,79 +170,72 @@ public class StocksService(
     
     public async Task<PagedResultModel<StockDto>> GetByFilter(StocksFilterModel filter)
     {
-        try
+        var query = repository.Stocks.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
         {
-            var query = repository.Stocks.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(filter.Search))
-            {
-                var search = filter.Search.ToLower();
-                query = query.Where(s =>
-                    s.Title.ToLower().Contains(search) ||
-                    s.Symbol.ToLower().Contains(search));
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.Title))
-            {
-                var title = filter.Title.ToLower();
-                query = query.Where(s => s.Title.ToLower().Contains(title));
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.Symbol))
-            {
-                var symbol = filter.Symbol.ToLower();
-                query = query.Where(s => s.Symbol.ToLower().Contains(symbol));
-            }
-
-            if (filter.CompanyId.HasValue)
-                query = query.Where(s => s.CompanyId == filter.CompanyId.Value);
-
-            if (filter.PriceFrom.HasValue)
-                query = query.Where(s => s.Price >= filter.PriceFrom.Value);
-
-            if (filter.PriceTo.HasValue)
-                query = query.Where(s => s.Price <= filter.PriceTo.Value);
-
-            var totalCount = await query.CountAsync();
-
-            if (!string.IsNullOrEmpty(filter.SortBy))
-            {
-                query = filter.SortAscending
-                    ? query.OrderByDynamic(filter.SortBy)
-                    : query.OrderByDescendingDynamic(filter.SortBy);
-            }
-            else
-            {
-                query = query.OrderByDescending(s => s.CreatedAt);
-            }
-
-            var items = await query
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .Select(s => new StockDto
-                {
-                    Id = s.Id,
-                    Title = s.Title,
-                    Symbol = s.Symbol,
-                    Price = s.Price,
-                    CreatedAt = s.CreatedAt,
-                    UpdatedAt = s.UpdatedAt,
-                    CompanyId = s.CompanyId
-                })
-                .ToListAsync();
-
-            return new PagedResultModel<StockDto>
-            {
-                Items = items,
-                TotalCount = totalCount,
-                Page = filter.Page,
-                PageSize = filter.PageSize
-            };
+            var search = filter.Search.ToLower();
+            query = query.Where(s =>
+                s.NormalizedTitle.Contains(search) ||
+                s.NormalizedSymbol.Contains(search));
         }
-        catch (Exception e)
+
+        if (filter.CompanyIds is { Count: > 0 })
+            query = query.Where(s => s.CompanyId.HasValue && filter.CompanyIds.Contains(s.CompanyId.Value));
+
+        if (filter.Symbols is { Count: > 0 })
         {
-            throw new Exception(e.Message, e);
+            var normalizedSymbols = filter.Symbols.Select(s => s.NormalizeText()).ToList();
+            query = query.Where(s => normalizedSymbols.Contains(s.NormalizedSymbol));
         }
+
+        if (!string.IsNullOrWhiteSpace(filter.Title))
+        {
+            var title = filter.Title.NormalizeText();
+            query = query.Where(s => s.NormalizedTitle.Contains(title));
+        }
+
+        if (filter.PriceFrom.HasValue)
+            query = query.Where(s => s.Price >= filter.PriceFrom.Value);
+
+        if (filter.PriceTo.HasValue)
+            query = query.Where(s => s.Price <= filter.PriceTo.Value);
+
+        var totalCount = await query.CountAsync();
+
+        if (!string.IsNullOrEmpty(filter.SortBy))
+        {
+            query = filter.SortAscending
+                ? query.OrderByDynamic(filter.SortBy)
+                : query.OrderByDescendingDynamic(filter.SortBy);
+        }
+        else
+        {
+            query = query.OrderByDescending(s => s.CreatedAt);
+        }
+
+        var items = await query
+            .Skip((filter.Page - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .Select(s => new StockDto
+            {
+                Id = s.Id,
+                Title = s.Title,
+                Symbol = s.Symbol,
+                Price = s.Price,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                CompanyId = s.CompanyId
+            })
+            .ToListAsync();
+
+        return new PagedResultModel<StockDto>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = filter.Page,
+            PageSize = filter.PageSize
+        };
     }
     
     public async Task<bool> DeleteById(Guid id)
