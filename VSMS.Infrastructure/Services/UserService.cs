@@ -1,13 +1,16 @@
 ﻿using MessageService.Domain.Enums;
 using MessageService.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.Constants;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
 using VSMS.Domain.Exceptions;
 using VSMS.Domain.Models;
+using VSMS.Infrastructure.Extensions;
 using VSMS.Infrastructure.Interfaces;
+using VSMS.Repository;
 using VSMS.Utilities.Helpers;
 
 namespace VSMS.Infrastructure.Services;
@@ -17,7 +20,8 @@ public class UserService(
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
     ITokenService tokenService,
-    IMessageServiceClient messageServiceClient) : IUserService
+    IMessageServiceClient messageServiceClient,
+    ApplicationRepository repository) : IUserService
 {
     #region Identity
     
@@ -107,6 +111,7 @@ public class UserService(
                     Email = createdUser.Email,
                     PhoneNumber = createdUser.PhoneNumber,
                     Role = userRole!,
+                    
                 },
             };
         }
@@ -132,7 +137,8 @@ public class UserService(
         }
         catch (Exception e)
         {
-            throw new Exception(e.Message, e);
+            logger.LogError(e, e.Message);
+            return null;
         }
     }
     
@@ -140,15 +146,18 @@ public class UserService(
     {
         try
         {
-            var user = await userManager.FindByIdAsync(userId.ToString());
+            var user = await userManager.Users
+                .Include(u => u.Company)
+                .FirstOrDefaultAsync(u => u.CompanyId == userId);
             if (user is null)
                 throw new UserNotFoundException(userId);
-
+            
             return user;
         }
         catch (Exception e)
         {
-            throw new Exception(e.Message, e);
+            logger.LogError(e, e.Message);
+            return null;
         }
     }
     
@@ -160,7 +169,9 @@ public class UserService(
     {
         try
         {
-            var user = await userManager.FindByIdAsync(userId.ToString());
+            var user = await userManager.Users
+                .Include(u => u.Company)
+                .FirstOrDefaultAsync(u => u.Id == userId);
             if (user is null)
                 throw new UserNotFoundException(userId);
 
@@ -174,7 +185,8 @@ public class UserService(
                 LastName = user.LastName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                Role = roles.FirstOrDefault() ?? "None"
+                Role = roles.FirstOrDefault() ?? "None",
+                CompanyId = user.Company.Id,
             };
         }
         catch (Exception e)
@@ -189,21 +201,30 @@ public class UserService(
         {
             var generatedPassword = PasswordHelper.GeneratePassword();
             
+            var company = await repository.Companies.FirstOrDefaultAsync(c => c.Id == model.CompanyId);
+            
             var createRes = await userManager.CreateAsync(new ApplicationUser
             {
                 UserName = model.Username,
                 Email = model.Email,
+                CompanyId = company is not null 
+                    ? model.CompanyId 
+                    : null,
             }, generatedPassword);
             if (!createRes.Succeeded)
                 throw new Exception(string.Join(Environment.NewLine, createRes.Errors.Select(e => $"{e.Code}: {e.Description}")));
-            
-            var createdUser = await userManager.FindByEmailAsync(model.Email);
+
+            var createdUser = await userManager.Users
+                .Include(u => u.Company)
+                .FirstOrDefaultAsync(u => string.Equals(u.NormalizedEmail, model.Email.NormalizeText(),
+                    StringComparison.InvariantCultureIgnoreCase));
             if (createdUser is null)
                 throw new UserNotFoundException(model.Email);
             
             var roleAssignResult = await userManager.AddToRoleAsync(createdUser, model.RoleName);
             if (!roleAssignResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, roleAssignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                throw new Exception(string.Join(Environment.NewLine,
+                    roleAssignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             
             var userRole = (await userManager.GetRolesAsync(createdUser)).FirstOrDefault();
 
@@ -227,6 +248,7 @@ public class UserService(
                 Email = createdUser.Email,
                 PhoneNumber = createdUser.PhoneNumber,
                 Role = userRole!,
+                CompanyId = createdUser.Company.Id,
             };
         }
         catch (Exception e)
@@ -239,10 +261,12 @@ public class UserService(
     {
         try
         {
-            var user = await userManager.FindByIdAsync(updatingUser.Id.ToString());
+            var user = await userManager.Users
+                .Include( u => u.Company)
+                .FirstOrDefaultAsync(u => u.Id == updatingUser.Id);
             if (user is null)
                 throw new UserNotFoundException(updatingUser.Id);
-
+            
             user.FirstName = updatingUser.FirstName ?? user.FirstName;
             user.LastName = updatingUser.LastName ?? user.LastName;
             user.Email = updatingUser.Email ?? user.Email;
@@ -251,7 +275,8 @@ public class UserService(
 
             var updateResult = await userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
-                throw new Exception(string.Join(Environment.NewLine, updateResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                throw new Exception(string.Join(Environment.NewLine,
+                    updateResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
 
             var existingRoles = await userManager.GetRolesAsync(user);
             var currentRole = existingRoles.FirstOrDefault();
@@ -262,12 +287,14 @@ public class UserService(
                 {
                     var removeResult = await userManager.RemoveFromRoleAsync(user, currentRole);
                     if (!removeResult.Succeeded)
-                        throw new Exception(string.Join(Environment.NewLine, removeResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                        throw new Exception(string.Join(Environment.NewLine,
+                            removeResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
                 }
 
                 var assignResult = await userManager.AddToRoleAsync(user, updatingUser.Role);
                 if (!assignResult.Succeeded)
-                    throw new Exception(string.Join(Environment.NewLine, assignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
+                    throw new Exception(string.Join(Environment.NewLine,
+                        assignResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             }
 
             return new UserProfileDto
@@ -278,7 +305,8 @@ public class UserService(
                 LastName = user.LastName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                Role = updatingUser.Role
+                Role = updatingUser.Role,
+                CompanyId = user.CompanyId,
             };
         }
         catch (Exception e)
@@ -315,7 +343,9 @@ public class UserService(
     {
         try
         {
-            var users = userManager.Users.ToList();
+            var users = await userManager.Users
+                .Include(u => u.Company)
+                .ToListAsync();
 
             var profiles = new List<UserProfileDto>();
 
@@ -333,7 +363,8 @@ public class UserService(
                     LastName = user.LastName,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber,
-                    Role = roles.FirstOrDefault() ?? "None"
+                    Role = roles.FirstOrDefault() ?? "None",
+                    CompanyId = user.CompanyId
                 });
             }
 

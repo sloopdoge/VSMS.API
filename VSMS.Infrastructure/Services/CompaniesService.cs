@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VSMS.Domain.DTOs;
 using VSMS.Domain.Entities;
@@ -16,7 +15,6 @@ namespace VSMS.Infrastructure.Services;
 public class CompaniesService(
     ILogger<CompaniesService> logger,
     ApplicationRepository repository,
-    UserManager<ApplicationUser> userManager,
     ICompanyUsersService companyUsersService) : ICompaniesService
 {
     public async Task<CompanyDto> Create(CompanyDto model)

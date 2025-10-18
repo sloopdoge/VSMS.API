@@ -1,4 +1,6 @@
 ﻿using VSMS.Domain.DTOs;
+using VSMS.Domain.Entities;
+using VSMS.Domain.Exceptions;
 
 namespace VSMS.Infrastructure.Interfaces;
 
@@ -26,4 +28,22 @@ public interface ICompanyUsersService
     /// <param name="companyId">Identifier of the company.</param>
     /// <returns>A collection of <see cref="UserProfileDto"/> representing the company's users.</returns>
     Task<List<UserProfileDto>> GetAllUsersInCompany(Guid companyId);
+
+    /// <summary>
+    /// Retrieves the company that contains the specified user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user whose associated company is to be retrieved.</param>
+    /// <returns>
+    /// A <see cref="Company"/> entity that the user belongs to.
+    /// </returns>
+    /// <exception cref="UserCompanyNotFoundException">
+    /// Thrown when no company containing the specified user is found.
+    /// </exception>
+    /// <remarks>
+    /// This method performs a query against the <c>Companies</c> repository to find the company
+    /// that includes a user with the given <paramref name="userId"/>. 
+    /// It is optimized to avoid unnecessary data loading and should be used when you need to
+    /// determine the user's company context.
+    /// </remarks>
+    Task<Company?> GetUserCompany(Guid userId);
 }

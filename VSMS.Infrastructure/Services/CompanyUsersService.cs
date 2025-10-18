@@ -100,4 +100,22 @@ public class CompanyUsersService(
             throw new Exception(e.Message, e);
         }
     }
+
+    public async Task<Company?> GetUserCompany(Guid userId)
+    {
+        try
+        {
+            var company = await repository.Companies
+                .Where(c => c.Users.Any(u => u.Id == userId))
+                .FirstOrDefaultAsync();
+
+            return company ?? throw new UserCompanyNotFoundException(userId);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, e.Message);
+            return null;
+        }
+    }
+
 }
